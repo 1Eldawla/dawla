@@ -2,78 +2,135 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم المستر - Eldawla</title>
+    <title>لوحة تحكم المستر Dawla</title>
     <style>
-        /* الألوان اللي بتحبها */
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e14; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background-color: #161b22; padding: 25px; border-radius: 12px; width: 400px; border: 1px solid #30363d; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #8a2be2; color: white; font-weight: bold; cursor: pointer; }
-        .error { color: #f44336; margin-bottom: 10px; }
+        :root { --primary: #7c3aed; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+        .container { max-width: 1000px; margin: auto; }
+        .header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
+        .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; border: 1px solid #334155; }
+        input, select { padding: 12px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; grid-column: 1 / -1; }
+        .student-folder { background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 20px; border-right: 6px solid var(--primary); }
+        .folder-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table th, td { padding: 12px; text-align: center; border-bottom: 1px solid #334155; }
+        .btn-del { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px; }
+        .btn-lock { background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div id="adminLogin">
-        <h2 style="color: #00d2ff;">دخول المستر</h2>
-        <input type="text" id="user" placeholder="اسم المستخدم">
-        <input type="password" id="pass" placeholder="كلمة السر">
-        <button onclick="loginAdmin()">دخول</button>
-        <p id="err" class="error"></p>
-    </div>
-
-    <div id="adminPanel" style="display:none;">
-        <h2 style="color: #8a2be2;">إضافة بيانات الطالب</h2>
-        <input type="text" id="sName" placeholder="اسم الطالب">
-        <input type="text" id="sCode" placeholder="كود الطالب">
-        <input type="text" id="sLevel" placeholder="المستوى (مثلاً 33)">
-        <input type="number" id="sGrade" placeholder="الدرجة">
-        <input type="number" id="sAmount" placeholder="مبلغ الدفع (مثلاً 50)">
-        <select id="sPaid">
-            <option value="true">تم الدفع ✅</option>
-            <option value="false">لم يدفع ❌</option>
-        </select>
-        <button onclick="saveData()" style="background-color: #238636;">حفظ في السجل</button>
-        <button onclick="location.reload()" style="background-color: #30363d; margin-top: 10px;">خروج</button>
-    </div>
-</div>
-
-<script>
-    // بيانات المستر اللي أنت طلبتها
-    function loginAdmin() {
-        const u = document.getElementById('user').value;
-        const p = document.getElementById('pass').value;
-        if (u === "Dawla" && p === "123400") {
-            document.getElementById('adminLogin').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-        } else {
-            document.getElementById('err').innerText = "بيانات خطأ!";
-        }
-    }
-
-    function saveData() {
-        let name = document.getElementById('sName').value;
-        let code = document.getElementById('sCode').value;
-        let level = document.getElementById('sLevel').value;
-        let grade = document.getElementById('sGrade').value;
-        let amount = document.getElementById('sAmount').value;
-        let paid = document.getElementById('sPaid').value === "true";
-        let date = new Date().toLocaleDateString('ar-EG');
-
-        let students = JSON.parse(localStorage.getItem('students')) || [];
-        let student = students.find(s => s.code === code);
-
-        if (!student) {
-            student = { name: name, code: code, password: "", grades: [] };
-            students.push(student);
-        }
+    <div class="container">
+        <div class="header"><h1>لوحة تحكم المستر Dawla 🎓</h1></div>
         
-        // إضافة البيانات الجديدة للجدول
-        student.grades.push({ date: date, level: level, grade: grade, amount: amount, paid: paid });
-        localStorage.setItem('students', JSON.stringify(students));
-        alert("تم الحفظ بنجاح يا مستر!");
-    }
-</script>
+        <div class="input-card">
+            <input type="text" id="sid" placeholder="كود الطالب">
+            <input type="text" id="sname" placeholder="اسم الطالب">
+            <input type="number" id="sgrade" placeholder="الدرجة">
+            <input type="text" id="slevel" placeholder="المستوى">
+            <input type="number" id="spay" placeholder="المبلغ المطلوب">
+            <select id="spaid">
+                <option value="✅">دفع صح ✅</option>
+                <option value="❌">مدافعش غلط ❌</option>
+            </select>
+            <button class="btn-add" onclick="saveData()">إضافة الحصة ونشرها للطالب</button>
+        </div>
+
+        <div id="studentsList"></div>
+    </div>
+
+    <script>
+        window.onload = renderAdmin;
+
+        function saveData() {
+            const id = document.getElementById('sid').value.trim();
+            const name = document.getElementById('sname').value.trim();
+            
+            if(!id || !name) return alert("يا مستر لازم تدخل الكود والاسم!");
+
+            let students = JSON.parse(localStorage.getItem('students')) || {};
+            
+            // تهيئة الطالب لو مش موجود
+            if(!students[id]) {
+                students[id] = { 
+                    name: name, 
+                    password: "", 
+                    isLocked: false, 
+                    history: [] 
+                };
+            }
+
+            // إضافة الحصة
+            const newSession = {
+                date: new Date().toLocaleDateString('ar-EG'),
+                grade: document.getElementById('sgrade').value || "0",
+                level: document.getElementById('slevel').value || "-",
+                pay: document.getElementById('spay').value || "0",
+                paidStatus: document.getElementById('spaid').value
+            };
+
+            students[id].history.push(newSession);
+            localStorage.setItem('students', JSON.stringify(students));
+            
+            renderAdmin();
+            alert("تم إرسال البيانات لملف " + name);
+        }
+
+        function deleteSession(id, index) {
+            let students = JSON.parse(localStorage.getItem('students'));
+            students[id].history.splice(index, 1);
+            localStorage.setItem('students', JSON.stringify(students));
+            renderAdmin();
+        }
+
+        function deleteFile(id) {
+            if(confirm("هل تريد مسح ملف الطالب بالكامل؟")) {
+                let students = JSON.parse(localStorage.getItem('students'));
+                delete students[id];
+                localStorage.setItem('students', JSON.stringify(students));
+                renderAdmin();
+            }
+        }
+
+        function toggleLock(id) {
+            let students = JSON.parse(localStorage.getItem('students'));
+            students[id].isLocked = !students[id].isLocked;
+            localStorage.setItem('students', JSON.stringify(students));
+            renderAdmin();
+        }
+
+        function renderAdmin() {
+            const students = JSON.parse(localStorage.getItem('students')) || {};
+            const container = document.getElementById('studentsList');
+            container.innerHTML = '';
+
+            for(let id in students) {
+                let rows = students[id].history.map((h, i) => `
+                    <tr>
+                        <td>${h.date}</td>
+                        <td>${h.grade}</td>
+                        <td>${h.pay} ج.م</td>
+                        <td>${h.paidStatus}</td>
+                        <td><button class="btn-del" onclick="deleteSession('${id}', ${i})">حذف</button></td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML += `
+                <div class="student-folder">
+                    <div class="folder-header">
+                        <h3>📁 ${students[id].name} (كود: ${id}) ${students[id].isLocked ? '🔒' : ''}</h3>
+                        <div>
+                            <button class="btn-lock" onclick="toggleLock('${id}')">${students[id].isLocked ? 'فتح الملف' : 'قفل الملف'}</button>
+                            <button class="btn-del" onclick="deleteFile('${id}')">حذف الملف</button>
+                        </div>
+                    </div>
+                    <table class="history-table">
+                        <thead><tr><th>التاريخ</th><th>الدرجة</th><th>المبلغ</th><th>الحالة</th><th>تحكم</th></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="5">لا يوجد حصص</td></tr>'}</tbody>
+                    </table>
+                </div>`;
+            }
+        }
+    </script>
 </body>
 </html>
