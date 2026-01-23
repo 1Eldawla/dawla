@@ -2,78 +2,203 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم المستر Dawla</title>
+    <title>لوحة تحكم المستر Dawla | ملفات ذكية</title>
     <style>
-        :root { --primary: #7c3aed; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        :root { --primary: #7c3aed; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #00d2ff; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
-        .container { max-width: 1000px; margin: auto; }
+        .container { max-width: 1100px; margin: auto; }
         .header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
-        .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; border: 1px solid #334155; }
+        
+        /* صناعة المجموعات */
+        .class-manager { background: #161b22; padding: 20px; border-radius: 15px; border: 1px dashed var(--accent); margin-bottom: 30px; display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .class-manager input { width: 250px; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .btn-create { background: var(--accent); color: #000; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* التبويبات */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 25px; background: var(--card); border: 1px solid #334155; color: white; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .tab-btn.active { background: var(--primary); border-color: var(--accent); }
+        .del-class-btn { color: #ff4d4d; font-weight: bold; font-size: 18px; }
+
+        /* كارت الإضافة */
+        .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; border: 2px solid var(--primary); }
+        .input-card h3 { grid-column: 1/-1; margin: 0; color: var(--accent); text-align: center; }
         input, select { padding: 12px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
         .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; grid-column: 1 / -1; }
-        .student-folder { background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 20px; border-right: 6px solid var(--primary); }
-        .folder-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .history-table { width: 100%; border-collapse: collapse; }
+
+        /* ملف الطالب الجديد (المطوي) */
+        .student-folder { background: var(--card); border-radius: 15px; margin-bottom: 12px; border: 1px solid #334155; overflow: hidden; transition: 0.3s; }
+        
+        .folder-summary { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #242f42; }
+        .folder-summary:hover { background: #2d3a4f; }
+        .folder-summary h3 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        
+        .folder-content { display: none; padding: 20px; background: var(--card); border-top: 1px solid #334155; }
+        .folder-content.open { display: block; animation: slideDown 0.3s ease-out; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .history-table { width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 10px; overflow: hidden; }
         .history-table th, td { padding: 12px; text-align: center; border-bottom: 1px solid #334155; }
-        .btn-del { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px; }
-        .btn-lock { background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        
+        .btn-del { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .status-badge { background: var(--primary); font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; }
+        .arrow { transition: 0.3s; }
+        .open .arrow { transform: rotate(180deg); }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><h1>لوحة تحكم المستر Dawla 🎓</h1></div>
-        
+        <div class="header">
+            <h1>لوحة تحكم المستر Dawla 🎓</h1>
+            <p>إدارة المجموعات والطلاب</p>
+        </div>
+
+        <div class="class-manager">
+            <strong>أضف مجموعة جديدة:</strong>
+            <input type="text" id="newClassName" placeholder="مثلاً: أولى إعدادي">
+            <button class="btn-create" onclick="createClass()">+ إنشاء المجموعة</button>
+        </div>
+
+        <div id="tabsContainer" class="tabs"></div>
+
         <div class="input-card">
+            <h3>إضافة طالب في: <span id="activeClassNameText" style="color:white">...</span></h3>
             <input type="text" id="sid" placeholder="كود الطالب">
             <input type="text" id="sname" placeholder="اسم الطالب">
             <input type="number" id="sgrade" placeholder="الدرجة">
-            <input type="text" id="slevel" placeholder="المستوى">
-            <input type="number" id="spay" placeholder="المبلغ المطلوب">
+            <input type="text" id="sexam_name" placeholder="اسم الامتحان">
+            <input type="number" id="spay" placeholder="المبلغ">
             <select id="spaid">
-                <option value="✅">دفع صح ✅</option>
-                <option value="❌">مدافعش غلط ❌</option>
+                <option value="✅">دفع ✅</option>
+                <option value="❌">لم يدفع ❌</option>
             </select>
-            <button class="btn-add" onclick="saveData()">إضافة الحصة ونشرها للطالب</button>
+            <input type="hidden" id="slevel_class"> 
+            <button class="btn-add" onclick="saveData()">إضافة ونشر البيانات</button>
         </div>
 
         <div id="studentsList"></div>
     </div>
 
     <script>
-        window.onload = renderAdmin;
+        let myClasses = JSON.parse(localStorage.getItem('myClasses')) || ["عام"];
+        let currentClass = localStorage.getItem('lastClass') || myClasses[0];
+
+        window.onload = () => updateUI();
+
+        function createClass() {
+            const name = document.getElementById('newClassName').value.trim();
+            if(!name) return;
+            myClasses.push(name);
+            localStorage.setItem('myClasses', JSON.stringify(myClasses));
+            document.getElementById('newClassName').value = "";
+            switchClass(name);
+        }
+
+        function deleteClass(className) {
+            if(confirm(`حذف مجموعة "${className}"؟`)) {
+                myClasses = myClasses.filter(c => c !== className);
+                if(myClasses.length === 0) myClasses = ["عام"];
+                localStorage.setItem('myClasses', JSON.stringify(myClasses));
+                switchClass(myClasses[0]);
+            }
+        }
+
+        function switchClass(className) {
+            currentClass = className;
+            localStorage.setItem('lastClass', className);
+            updateUI();
+        }
+
+        function updateUI() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            tabsContainer.innerHTML = myClasses.map(c => `
+                <div class="tab-btn ${currentClass === c ? 'active' : ''}" onclick="switchClass('${c}')">
+                    ${c} <span class="del-class-btn" onclick="event.stopPropagation(); deleteClass('${c}')">×</span>
+                </div>
+            `).join('');
+            document.getElementById('activeClassNameText').innerText = currentClass;
+            document.getElementById('slevel_class').value = currentClass;
+            renderAdmin();
+        }
 
         function saveData() {
             const id = document.getElementById('sid').value.trim();
             const name = document.getElementById('sname').value.trim();
-            
-            if(!id || !name) return alert("يا مستر لازم تدخل الكود والاسم!");
+            const levelClass = document.getElementById('slevel_class').value;
+            if(!id || !name) return alert("دخل كود واسم الطالب!");
 
             let students = JSON.parse(localStorage.getItem('students')) || {};
-            
-            // تهيئة الطالب لو مش موجود
-            if(!students[id]) {
-                students[id] = { 
-                    name: name, 
-                    password: "", 
-                    isLocked: false, 
-                    history: [] 
-                };
-            }
+            if(!students[id]) students[id] = { name: name, levelClass: levelClass, history: [] };
+            else students[id].levelClass = levelClass;
 
-            // إضافة الحصة
-            const newSession = {
+            students[id].history.push({
                 date: new Date().toLocaleDateString('ar-EG'),
                 grade: document.getElementById('sgrade').value || "0",
-                level: document.getElementById('slevel').value || "-",
+                examName: document.getElementById('sexam_name').value || "حصة",
                 pay: document.getElementById('spay').value || "0",
                 paidStatus: document.getElementById('spaid').value
-            };
+            });
 
-            students[id].history.push(newSession);
             localStorage.setItem('students', JSON.stringify(students));
-            
             renderAdmin();
-            alert("تم إرسال البيانات لملف " + name);
+            alert(`تم الحفظ بنجاح`);
+        }
+
+        // دالة لفتح وإغلاق الملف
+        function toggleFolder(id) {
+            const content = document.getElementById('content-' + id);
+            const isVisible = content.style.display === 'block';
+            
+            // إغلاق أي ملفات أخرى مفتوحة (اختياري - لو عايز ملف واحد بس يفتح كل مرة)
+            // document.querySelectorAll('.folder-content').forEach(el => el.style.display = 'none');
+
+            content.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function renderAdmin() {
+            const students = JSON.parse(localStorage.getItem('students')) || {};
+            const container = document.getElementById('studentsList');
+            container.innerHTML = '';
+            let found = false;
+
+            for(let id in students) {
+                if(students[id].levelClass !== currentClass) continue;
+                found = true;
+                
+                const student = students[id];
+                const rows = student.history.map((h, i) => `
+                    <tr>
+                        <td>${h.date}</td>
+                        <td>${h.examName}</td>
+                        <td style="color:var(--accent)">${h.grade}</td>
+                        <td>${h.pay} ج.م</td>
+                        <td>${h.paidStatus}</td>
+                        <td><button class="btn-del" onclick="deleteSession('${id}', ${i})">❌</button></td>
+                    </tr>
+                `).reverse().join('');
+
+                container.innerHTML += `
+                <div class="student-folder">
+                    <div class="folder-summary" onclick="toggleFolder('${id}')">
+                        <h3>📁 ${student.name} <span style="opacity:0.6; font-size:0.8rem">#${id}</span></h3>
+                        <div style="display:flex; align-items:center; gap:15px">
+                            <span class="status-badge">${student.history.length} حصص</span>
+                            <span class="arrow">▼</span>
+                        </div>
+                    </div>
+                    <div class="folder-content" id="content-${id}">
+                        <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
+                             <button class="btn-del" onclick="deleteStudent('${id}')">حذف الطالب نهائياً</button>
+                        </div>
+                        <table class="history-table">
+                            <thead><tr><th>التاريخ</th><th>الموضوع</th><th>الدرجة</th><th>المبلغ</th><th>الحالة</th><th>حذف</th></tr></thead>
+                            <tbody>${rows || '<tr><td colspan="6">لا يوجد سجلات</td></tr>'}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+            }
+            if(!found) container.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5">المجموعة فاضية.. ضيف طلاب!</div>`;
         }
 
         function deleteSession(id, index) {
@@ -83,52 +208,12 @@
             renderAdmin();
         }
 
-        function deleteFile(id) {
-            if(confirm("هل تريد مسح ملف الطالب بالكامل؟")) {
+        function deleteStudent(id) {
+            if(confirm("حذف الطالب بالكامل؟")) {
                 let students = JSON.parse(localStorage.getItem('students'));
                 delete students[id];
                 localStorage.setItem('students', JSON.stringify(students));
                 renderAdmin();
-            }
-        }
-
-        function toggleLock(id) {
-            let students = JSON.parse(localStorage.getItem('students'));
-            students[id].isLocked = !students[id].isLocked;
-            localStorage.setItem('students', JSON.stringify(students));
-            renderAdmin();
-        }
-
-        function renderAdmin() {
-            const students = JSON.parse(localStorage.getItem('students')) || {};
-            const container = document.getElementById('studentsList');
-            container.innerHTML = '';
-
-            for(let id in students) {
-                let rows = students[id].history.map((h, i) => `
-                    <tr>
-                        <td>${h.date}</td>
-                        <td>${h.grade}</td>
-                        <td>${h.pay} ج.م</td>
-                        <td>${h.paidStatus}</td>
-                        <td><button class="btn-del" onclick="deleteSession('${id}', ${i})">حذف</button></td>
-                    </tr>
-                `).join('');
-
-                container.innerHTML += `
-                <div class="student-folder">
-                    <div class="folder-header">
-                        <h3>📁 ${students[id].name} (كود: ${id}) ${students[id].isLocked ? '🔒' : ''}</h3>
-                        <div>
-                            <button class="btn-lock" onclick="toggleLock('${id}')">${students[id].isLocked ? 'فتح الملف' : 'قفل الملف'}</button>
-                            <button class="btn-del" onclick="deleteFile('${id}')">حذف الملف</button>
-                        </div>
-                    </div>
-                    <table class="history-table">
-                        <thead><tr><th>التاريخ</th><th>الدرجة</th><th>المبلغ</th><th>الحالة</th><th>تحكم</th></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="5">لا يوجد حصص</td></tr>'}</tbody>
-                    </table>
-                </div>`;
             }
         }
     </script>
