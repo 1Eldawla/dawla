@@ -2,50 +2,78 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم - Eldawla</title>
+    <title>لوحة تحكم المستر - Eldawla</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; text-align: center; }
-        .box { background: white; padding: 20px; border-radius: 10px; display: inline-block; text-align: right; width: 400px; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
+        /* الألوان اللي بتحبها */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e14; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background-color: #161b22; padding: 25px; border-radius: 12px; width: 400px; border: 1px solid #30363d; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #8a2be2; color: white; font-weight: bold; cursor: pointer; }
+        .error { color: #f44336; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>إضافة درجة ودفع طالب</h2>
+
+<div class="container">
+    <div id="adminLogin">
+        <h2 style="color: #00d2ff;">دخول المستر</h2>
+        <input type="text" id="user" placeholder="اسم المستخدم">
+        <input type="password" id="pass" placeholder="كلمة السر">
+        <button onclick="loginAdmin()">دخول</button>
+        <p id="err" class="error"></p>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+        <h2 style="color: #8a2be2;">إضافة بيانات الطالب</h2>
         <input type="text" id="sName" placeholder="اسم الطالب">
         <input type="text" id="sCode" placeholder="كود الطالب">
-        <input type="text" id="sLevel" placeholder="المستوى">
+        <input type="text" id="sLevel" placeholder="المستوى (مثلاً 33)">
         <input type="number" id="sGrade" placeholder="الدرجة">
-        <input type="number" id="sAmount" placeholder="المبلغ (مثلاً 50)">
+        <input type="number" id="sAmount" placeholder="مبلغ الدفع (مثلاً 50)">
         <select id="sPaid">
             <option value="true">تم الدفع ✅</option>
             <option value="false">لم يدفع ❌</option>
         </select>
-        <button onclick="addStudent()">حفظ البيانات</button>
+        <button onclick="saveData()" style="background-color: #238636;">حفظ في السجل</button>
+        <button onclick="location.reload()" style="background-color: #30363d; margin-top: 10px;">خروج</button>
     </div>
+</div>
 
-    <script>
-        function addStudent() {
-            let name = document.getElementById('sName').value;
-            let code = document.getElementById('sCode').value;
-            let level = document.getElementById('sLevel').value;
-            let grade = document.getElementById('sGrade').value;
-            let amount = document.getElementById('sAmount').value;
-            let paid = document.getElementById('sPaid').value === "true";
-            let date = new Date().toLocaleDateString('ar-EG');
-
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            let student = students.find(s => s.code === code);
-
-            if (!student) {
-                student = { name: name, code: code, password: "", grades: [] };
-                students.push(student);
-            }
-            student.grades.push({ date: date, level: level, grade: grade, amount: amount, paid: paid });
-            localStorage.setItem('students', JSON.stringify(students));
-            alert("تم الحفظ بنجاح!");
+<script>
+    // بيانات المستر اللي أنت طلبتها
+    function loginAdmin() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        if (u === "Dawla" && p === "123400") {
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+        } else {
+            document.getElementById('err').innerText = "بيانات خطأ!";
         }
-    </script>
+    }
+
+    function saveData() {
+        let name = document.getElementById('sName').value;
+        let code = document.getElementById('sCode').value;
+        let level = document.getElementById('sLevel').value;
+        let grade = document.getElementById('sGrade').value;
+        let amount = document.getElementById('sAmount').value;
+        let paid = document.getElementById('sPaid').value === "true";
+        let date = new Date().toLocaleDateString('ar-EG');
+
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let student = students.find(s => s.code === code);
+
+        if (!student) {
+            student = { name: name, code: code, password: "", grades: [] };
+            students.push(student);
+        }
+        
+        // إضافة البيانات الجديدة للجدول
+        student.grades.push({ date: date, level: level, grade: grade, amount: amount, paid: paid });
+        localStorage.setItem('students', JSON.stringify(students));
+        alert("تم الحفظ بنجاح يا مستر!");
+    }
+</script>
 </body>
 </html>
