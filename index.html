@@ -2,125 +2,98 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة Dawla التعليمية | Amr Gaber</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الطالب - Eldawla</title>
     <style>
-        body { background: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: #161b22; padding: 30px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { color: #7c4dff; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 8px; box-sizing: border-box; text-align: center; outline: none; }
-        input:focus { border-color: #7c4dff; }
-        button { width: 100%; padding: 12px; background: #7c4dff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: #6d28d9; }
-        .toggle-link { margin-top: 15px; font-size: 13px; color: #8b949e; cursor: pointer; display: block; }
-        .toggle-link b { color: #00f2ff; }
-        .hidden { display: none; }
-        .results-area { width: 100%; max-width: 800px; display: none; }
-        table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; margin-top: 20px; border: 1px solid #30363d; }
-        th, td { padding: 15px; border: 1px solid #30363d; text-align: center; }
-        th { background: #7c4dff; color: white; }
-        .dev-tag { margin-top: 25px; font-size: 11px; color: #444; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; min-width: 300px; }
+        input { display: block; width: 90%; margin: 10px auto; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .error { color: red; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div class="card" id="loginBox">
-        <h2>تسجيل دخول 🎓</h2>
-        <input type="text" id="loginId" placeholder="الكود (اللي خدته من المستر)">
-        <input type="password" id="loginPass" placeholder="كلمة السر">
-        <button onclick="login()">دخول وعرض الدرجات</button>
-        <span class="toggle-link" onclick="toggleView('registerBox', 'loginBox')">ليس لديك حساب؟ <b>إنشاء حساب جديد</b></span>
-        <div class="dev-tag">DEV: AMR GABER</div>
+<div class="container">
+    <div id="loginPage">
+        <h2>تسجيل دخول الطالب</h2>
+        <input type="text" id="studentCode" placeholder="كود الطالب">
+        <input type="password" id="studentPass" placeholder="كلمة السر">
+        <button onclick="login()">دخول</button>
+        <p id="loginError" class="error"></p>
+        <p>ليس لديك حساب؟ <span onclick="showRegister()" style="color:blue; cursor:pointer;">إنشاء حساب جديد</span></p>
     </div>
 
-    <div class="card hidden" id="registerBox">
-        <h2>حساب جديد 📝</h2>
-        <input type="text" id="regId" placeholder="أدخل الكود الخاص بك">
-        <input type="password" id="regPass" placeholder="اختر كلمة سر لحمايتك">
-        <button onclick="register()">إنشاء الحساب</button>
-        <span class="toggle-link" onclick="toggleView('loginBox', 'registerBox')">لديك حساب بالفعل؟ <b>تسجيل دخول</b></span>
-        <div class="dev-tag">DEV: AMR GABER</div>
+    <div id="registerPage" style="display:none;">
+        <h2>إنشاء حساب جديد</h2>
+        <input type="text" id="regCode" placeholder="كود الطالب">
+        <input type="password" id="regPass" placeholder="اختر كلمة سر">
+        <button onclick="register()">تسجيل</button>
+        <p id="regError" class="error"></p>
+        <p onclick="showLogin()" style="color:blue; cursor:pointer;">العودة لتسجيل الدخول</p>
     </div>
 
-    <div class="results-area" id="resultsArea">
-        <div class="card" style="max-width: 100%; margin-bottom: 20px;">
-            <h3 id="welcomeMsg" style="margin:0; color:#00f2ff;"></h3>
-        </div>
+    <div id="dataPage" style="display:none;">
+        <h2 id="welcomeMsg"></h2>
         <table>
             <thead>
                 <tr>
-                    <th>التاريخ</th>
+                    <th>المادة</th>
                     <th>الدرجة</th>
-                    <th>المستوى</th>
-                    <th>الحالة</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="gradesTable"></tbody>
         </table>
-        <button style="background:#334155; margin-top:20px; max-width:200px;" onclick="location.reload()">خروج وتسجيل خروج</button>
+        <br>
+        <button onclick="logout()" style="background:#dc3545;">تسجيل خروج</button>
     </div>
+</div>
 
-    <script>
-        function toggleView(showId, hideId) {
-            document.getElementById(showId).classList.remove('hidden');
-            document.getElementById(hideId).classList.add('hidden');
+<script>
+    function showRegister() { document.getElementById('loginPage').style.display='none'; document.getElementById('registerPage').style.display='block'; }
+    function showLogin() { document.getElementById('loginPage').style.display='block'; document.getElementById('registerPage').style.display='none'; }
+
+    function register() {
+        const code = document.getElementById('regCode').value;
+        const pass = document.getElementById('regPass').value;
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let student = students.find(s => s.code === code);
+
+        if (student) {
+            student.password = pass; // حفظ الباسورد للكود الموجود
+            localStorage.setItem('students', JSON.stringify(students));
+            alert("تم إنشاء الحساب بنجاح!");
+            showLogin();
+        } else {
+            document.getElementById('regError').innerText = "هذا الكود غير مسجل في النظام!";
         }
+    }
 
-        function register() {
-            const id = document.getElementById('regId').value;
-            const pass = document.getElementById('regPass').value;
-            if(!id || !pass) return alert("املا البيانات كاملة!");
+    function login() {
+        const code = document.getElementById('studentCode').value;
+        const pass = document.getElementById('studentPass').value;
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let student = students.find(s => s.code === code && s.password === pass);
 
-            let students = JSON.parse(localStorage.getItem('students')) || {};
-            
-            if (students[id] && students[id].password) {
-                alert("الكود ده محمي بباسورد فعلاً!");
-            } else {
-                if(!students[id]) students[id] = { name: "طالب جديد", history: [] };
-                students[id].password = pass;
-                localStorage.setItem('students', JSON.stringify(students));
-                alert("مبروك! حسابك جاهز بالباسورد، سجل دخولك دلوقتي.");
-                toggleView('loginBox', 'registerBox');
-            }
+        if (student) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dataPage').style.display = 'block';
+            document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
+            let tableContent = "";
+            student.grades.forEach(g => {
+                tableContent += `<tr><td>${g.subject}</td><td>${g.grade}</td></tr>`;
+            });
+            document.getElementById('gradesTable').innerHTML = tableContent;
+        } else {
+            document.getElementById('loginError').innerText = "الكود أو كلمة السر خطأ!";
         }
+    }
 
-        function login() {
-            const id = document.getElementById('loginId').value;
-            const pass = document.getElementById('loginPass').value;
+    function logout() { location.reload(); }
+</script>
 
-            // دخول المستر Dawla (الادمن)
-            if (id === "Dawla" && pass === "123400") {
-                window.location.href = "admin.html";
-                return;
-            }
-
-            // دخول الطالب وعرض درجاته فوراً
-            let students = JSON.parse(localStorage.getItem('students')) || {};
-            const student = students[id];
-
-            if (student && student.password === pass) {
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('registerBox').style.display = 'none';
-                document.getElementById('resultsArea').style.display = 'block';
-                document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + (student.name || id);
-
-                const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = "";
-                if (student.history && student.history.length > 0) {
-                    student.history.forEach(h => {
-                        tbody.innerHTML += `<tr>
-                            <td>${h.date}</td>
-                            <td>${h.grade}</td>
-                            <td>${h.level}</td>
-                            <td>${h.attendance}</td>
-                        </tr>`;
-                    });
-                } else {
-                    tbody.innerHTML = "<tr><td colspan='4'>لا توجد درجات مسجلة لك حالياً</td></tr>";
-                }
-            } else {
-                alert("الكود أو الباسورد غلط، تأكد من إنشاء حساب أولاً.");
-            }
-        }
-    </script>
 </body>
 </html>
