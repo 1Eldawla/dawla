@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>منصة Dawla التعليمية | Amr Gaber</title>
+    <style>
+        body { background: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: #161b22; padding: 30px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: #7c4dff; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 8px; box-sizing: border-box; text-align: center; outline: none; }
+        input:focus { border-color: #7c4dff; }
+        button { width: 100%; padding: 12px; background: #7c4dff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #6d28d9; }
+        .toggle-link { margin-top: 15px; font-size: 13px; color: #8b949e; cursor: pointer; display: block; }
+        .toggle-link b { color: #00f2ff; }
+        .hidden { display: none; }
+        .results-area { width: 100%; max-width: 800px; display: none; }
+        table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; margin-top: 20px; border: 1px solid #30363d; }
+        th, td { padding: 15px; border: 1px solid #30363d; text-align: center; }
+        th { background: #7c4dff; color: white; }
+        .dev-tag { margin-top: 25px; font-size: 11px; color: #444; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="loginBox">
+        <h2>تسجيل دخول 🎓</h2>
+        <input type="text" id="loginId" placeholder="الكود (اللي خدته من المستر)">
+        <input type="password" id="loginPass" placeholder="كلمة السر">
+        <button onclick="login()">دخول وعرض الدرجات</button>
+        <span class="toggle-link" onclick="toggleView('registerBox', 'loginBox')">ليس لديك حساب؟ <b>إنشاء حساب جديد</b></span>
+        <div class="dev-tag">DEV: AMR GABER</div>
+    </div>
+
+    <div class="card hidden" id="registerBox">
+        <h2>حساب جديد 📝</h2>
+        <input type="text" id="regId" placeholder="أدخل الكود الخاص بك">
+        <input type="password" id="regPass" placeholder="اختر كلمة سر لحمايتك">
+        <button onclick="register()">إنشاء الحساب</button>
+        <span class="toggle-link" onclick="toggleView('loginBox', 'registerBox')">لديك حساب بالفعل؟ <b>تسجيل دخول</b></span>
+        <div class="dev-tag">DEV: AMR GABER</div>
+    </div>
+
+    <div class="results-area" id="resultsArea">
+        <div class="card" style="max-width: 100%; margin-bottom: 20px;">
+            <h3 id="welcomeMsg" style="margin:0; color:#00f2ff;"></h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>التاريخ</th>
+                    <th>الدرجة</th>
+                    <th>المستوى</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <button style="background:#334155; margin-top:20px; max-width:200px;" onclick="location.reload()">خروج وتسجيل خروج</button>
+    </div>
+
+    <script>
+        function toggleView(showId, hideId) {
+            document.getElementById(showId).classList.remove('hidden');
+            document.getElementById(hideId).classList.add('hidden');
+        }
+
+        function register() {
+            const id = document.getElementById('regId').value;
+            const pass = document.getElementById('regPass').value;
+            if(!id || !pass) return alert("املا البيانات كاملة!");
+
+            let students = JSON.parse(localStorage.getItem('students')) || {};
+            
+            if (students[id] && students[id].password) {
+                alert("الكود ده محمي بباسورد فعلاً!");
+            } else {
+                if(!students[id]) students[id] = { name: "طالب جديد", history: [] };
+                students[id].password = pass;
+                localStorage.setItem('students', JSON.stringify(students));
+                alert("مبروك! حسابك جاهز بالباسورد، سجل دخولك دلوقتي.");
+                toggleView('loginBox', 'registerBox');
+            }
+        }
+
+        function login() {
+            const id = document.getElementById('loginId').value;
+            const pass = document.getElementById('loginPass').value;
+
+            // دخول المستر Dawla (الادمن)
+            if (id === "Dawla" && pass === "123400") {
+                window.location.href = "admin.html";
+                return;
+            }
+
+            // دخول الطالب وعرض درجاته فوراً
+            let students = JSON.parse(localStorage.getItem('students')) || {};
+            const student = students[id];
+
+            if (student && student.password === pass) {
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('registerBox').style.display = 'none';
+                document.getElementById('resultsArea').style.display = 'block';
+                document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + (student.name || id);
+
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = "";
+                if (student.history && student.history.length > 0) {
+                    student.history.forEach(h => {
+                        tbody.innerHTML += `<tr>
+                            <td>${h.date}</td>
+                            <td>${h.grade}</td>
+                            <td>${h.level}</td>
+                            <td>${h.attendance}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody.innerHTML = "<tr><td colspan='4'>لا توجد درجات مسجلة لك حالياً</td></tr>";
+                }
+            } else {
+                alert("الكود أو الباسورد غلط، تأكد من إنشاء حساب أولاً.");
+            }
+        }
+    </script>
+</body>
+</html>

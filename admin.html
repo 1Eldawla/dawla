@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم المستر الدولا | برمجة عمرو جابر</title>
+    <script>
+        let pass = prompt("أهلاً يا مستر الدولا.. أدخل كلمة السر لفتح السيستم:");
+        if (pass !== "123400") {
+            alert("باسورد غلط! مسموح للدولا وعمرو جابر بس بالدخول.");
+            window.location.href = "index.html";
+        }
+    </script>
+    <style>
+        :root { --main: #7c4dff; --bg: #0f172a; --card: #1e293b; --accent: #00f2ff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: white; padding: 20px; }
+        
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .dev-badge { background: var(--accent); color: #000; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 12px; }
+
+        .hero { background: linear-gradient(135deg, #6366f1, #a855f7); padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .admin-card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #334155; margin-bottom: 30px; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        
+        input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; font-size: 14px; }
+        .btn-add { background: var(--main); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; transition: 0.3s; }
+        .btn-add:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4); }
+
+        .folder { background: var(--card); margin-bottom: 15px; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+        summary { padding: 20px; cursor: pointer; background: #1e293b; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; }
+        
+        table { width: 100%; border-collapse: collapse; background: #111827; }
+        th, td { padding: 15px; text-align: center; border-bottom: 1px solid #1f2937; }
+        th { color: var(--accent); font-size: 13px; }
+        
+        .status-ok { color: #10b981; } .status-no { color: #ef4444; }
+        .del-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .footer-dev { text-align: center; margin-top: 50px; opacity: 0.5; font-size: 12px; border-top: 1px solid #334155; padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-top">
+        <div class="dev-badge">DEV: AMR GABER</div>
+        <div style="font-size: 12px;">v2.0 MSR-DAWLA</div>
+    </div>
+
+    <div class="hero">
+        <h1 style="margin:0;">لوحة تحكم المستر (الدولا) 🎓</h1>
+        <p style="opacity: 0.9;">سجل الحصص، عدل الدرجات، وتابع المستوى أول بأول.</p>
+    </div>
+
+    <div class="admin-card">
+        <h3 style="margin-top:0; color:var(--accent); display:flex; align-items:center; gap:10px;">
+            <span>📝 إضافة حصة جديدة للطالب</span>
+        </h3>
+        <div class="grid-inputs">
+            <input type="text" id="sid" placeholder="كود الطالب (1234)">
+            <input type="text" id="sname" placeholder="اسم الطالب (عمرو)">
+            <input type="number" id="sgrade" placeholder="الدرجة">
+            <input type="text" id="slevel" placeholder="المستوى (ممتاز/كويس)">
+            <select id="satt">
+                <option value="حاضر ✅">حاضر ✅</option>
+                <option value="غائب ❌">غائب ❌</option>
+            </select>
+        </div>
+        <button class="btn-add" onclick="save()">إضافة الحصة للسجل ونشرها للطالب</button>
+    </div>
+
+    <div id="foldersArea"></div>
+
+    <div class="footer-dev">
+        تم تطوير وبرمجة هذا النظام بواسطة <b>Amr Gaber</b> © 2026<br>
+        خصيصاً للمستر <b>الدولا</b>
+    </div>
+
+    <script>
+        function render() {
+            const area = document.getElementById('foldersArea');
+            area.innerHTML = "";
+            const students = JSON.parse(localStorage.getItem('students')) || {};
+
+            Object.keys(students).forEach(id => {
+                const s = students[id];
+                let rows = s.history.map((h, index) => `
+                    <tr>
+                        <td>${h.date}</td>
+                        <td>${h.grade}</td>
+                        <td>${h.level}</td>
+                        <td class="${h.attendance.includes('✅') ? 'status-ok' : 'status-no'}">${h.attendance}</td>
+                        <td><button class="del-btn" onclick="deleteSession('${id}', ${index})">حذف</button></td>
+                    </tr>
+                `).join('');
+
+                area.innerHTML += `
+                    <details class="folder">
+                        <summary>📁 الطالب: ${s.name} (كود: ${id}) <span style="color:var(--accent)">${s.history.length} حصة</span></summary>
+                        <table>
+                            <thead>
+                                <tr><th>التاريخ</th><th>الدرجة</th><th>المستوى</th><th>الحالة</th><th>تحكم</th></tr>
+                            </thead>
+                            <tbody>${rows || '<tr><td colspan="5">لا يوجد حصص</td></tr>'}</tbody>
+                        </table>
+                        <button style="background:#b91c1c; color:white; border:none; width:100%; padding:10px; cursor:pointer;" onclick="deleteStudent('${id}')">🗑️ حذف ملف الطالب بالكامل</button>
+                    </details>`;
+            });
+        }
+
+        function save() {
+            const id = document.getElementById('sid').value;
+            const name = document.getElementById('sname').value;
+            const grade = document.getElementById('sgrade').value;
+            const level = document.getElementById('slevel').value;
+            const att = document.getElementById('satt').value;
+
+            if(!id || !name) return alert("يا مستر لازم الكود والاسم!");
+
+            let students = JSON.parse(localStorage.getItem('students')) || {};
+            if(!students[id]) students[id] = { name: name, history: [], password: "" };
+
+            students[id].history.push({
+                date: new Date().toLocaleDateString('ar-EG'),
+                grade: grade, level: level, attendance: att
+            });
+
+            localStorage.setItem('students', JSON.stringify(students));
+            render();
+            alert("تم الحفظ بنجاح!");
+        }
+
+        function deleteSession(id, index) {
+            let students = JSON.parse(localStorage.getItem('students'));
+            students[id].history.splice(index, 1);
+            localStorage.setItem('students', JSON.stringify(students));
+            render();
+        }
+
+        function deleteStudent(id) {
+            if(confirm("هتمسح الطالب كله؟")) {
+                let students = JSON.parse(localStorage.getItem('students'));
+                delete students[id];
+                localStorage.setItem('students', JSON.stringify(students));
+                render();
+            }
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
