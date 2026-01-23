@@ -6,30 +6,29 @@
     <title>Eldawla Platform</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e14; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background-color: #161b22; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; text-align: center; border: 1px solid #30363d; }
+        .container { background-color: #161b22; padding: 25px; border-radius: 12px; width: 95%; max-width: 500px; text-align: center; border: 1px solid #30363d; }
         .welcome-box { background-color: #1c2128; border: 1px solid #30363d; padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #00d2ff; font-size: 1.2rem; font-weight: bold; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; color: white; box-sizing: border-box; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; color: white; box-sizing: border-box; text-align: center; }
         button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #238636; color: white; font-size: 16px; cursor: pointer; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; background-color: #161b22; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; background-color: #161b22; border-radius: 10px; overflow: hidden; margin-top: 10px; border: 1px solid #30363d; }
         th { background-color: #8a2be2; color: white; padding: 12px; font-size: 14px; }
-        td { padding: 12px; border-bottom: 1px solid #30363d; font-size: 14px; background-color: #0d1117; }
-        .pay-true { color: #4caf50; font-weight: bold; }
-        .pay-false { color: #f44336; font-weight: bold; }
-        .logout-btn { background-color: #30363d; color: white; margin-top: 20px; width: auto; padding: 10px 25px; }
+        td { padding: 12px; border-bottom: 1px solid #30363d; font-size: 14px; background-color: #0d1117; color: #e6edf3; }
+        .pay-success { color: #4caf50; font-weight: bold; }
+        .pay-fail { color: #f44336; font-weight: bold; }
+        .logout-btn { background-color: #30363d; color: white; margin-top: 20px; width: auto; padding: 10px 25px; border-radius: 8px; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="loginPage">
         <h2 style="color: #00d2ff;">تسجيل الدخول</h2>
-        <input type="text" id="studentCode" placeholder="كود الطالب">
-        <input type="password" id="studentPass" placeholder="كلمة السر">
+        <input type="text" id="studentCode" placeholder="كود الطالب"> <input type="password" id="studentPass" placeholder="كلمة السر">
         <button onclick="login()">دخول</button>
         <p onclick="showRegister()" style="color: #58a6ff; cursor: pointer; margin-top: 15px;">إنشاء حساب جديد</p>
     </div>
 
     <div id="registerPage" style="display:none;">
-        <h2 style="color: #00d2ff;">إنشاء حساب</h2>
+        <h2 style="color: #00d2ff;">إنشاء حساب جديد</h2>
         <input type="text" id="regCode" placeholder="كود الطالب">
         <input type="password" id="regPass" placeholder="اختر كلمة سر">
         <button onclick="register()">تسجيل</button>
@@ -44,8 +43,7 @@
                     <th>التاريخ</th>
                     <th>الدرجة</th>
                     <th>المستوى</th>
-                    <th>الدفع</th>
-                    <th>الحالة</th>
+                    <th>الدفع</th> <th>الحالة</th>
                 </tr>
             </thead>
             <tbody id="gradesTable"></tbody>
@@ -61,28 +59,46 @@
     function login() {
         const code = document.getElementById('studentCode').value;
         const pass = document.getElementById('studentPass').value;
+
+        // الحفاظ على دخول المستر Dawla من الصفحة الرئيسية
+        if (code === "Dawla" && pass === "123400") {
+            window.location.href = "admin.html";
+            return;
+        }
+
         let students = JSON.parse(localStorage.getItem('students')) || [];
         let student = students.find(s => s.code === code && s.password === pass);
+        
         if (student) {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dataPage').style.display = 'block';
             document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
             let rows = "";
             student.grades.forEach(g => {
-                let payStatus = g.paid ? `<span class="pay-true">${g.amount} ✅</span>` : `<span class="pay-false">${g.amount} ❌</span>`;
-                rows += `<tr><td>${g.date}</td><td>${g.grade}</td><td>${g.level}</td><td>${payStatus}</td><td>✅ حاضر</td></tr>`;
+                let payStatus = g.paid ? `<span class="pay-success">${g.amount} ✅</span>` : `<span class="pay-fail">${g.amount} ❌</span>`;
+                rows += `<tr>
+                    <td>${g.date}</td>
+                    <td>${g.grade}</td>
+                    <td>${g.level}</td>
+                    <td>${payStatus}</td>
+                    <td><span style="color:#4caf50;">✅ حاضر</span></td>
+                </tr>`;
             });
             document.getElementById('gradesTable').innerHTML = rows;
         } else { alert("بيانات خطأ!"); }
     }
-    // دالة التسجيل (مختصرة)
+
     function register() {
         const code = document.getElementById('regCode').value;
         const pass = document.getElementById('regPass').value;
         let students = JSON.parse(localStorage.getItem('students')) || [];
         let student = students.find(s => s.code === code);
-        if (student) { student.password = pass; localStorage.setItem('students', JSON.stringify(students)); alert("تم الحساب!"); showLogin(); }
-        else { alert("كود مش موجود!"); }
+        if (student) {
+            student.password = pass;
+            localStorage.setItem('students', JSON.stringify(students));
+            alert("تم إنشاء حسابك!");
+            showLogin();
+        } else { alert("الكود غير مسجل في السجل!"); }
     }
 </script>
 </body>
