@@ -5,39 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة الطالب - Eldawla</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
-        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; min-width: 300px; }
-        input { display: block; width: 90%; margin: 10px auto; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; width: 100%; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        .error { color: red; font-size: 14px; }
+        /* رجعتلك الستايل القديم بتاعك بالظبط */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #2c2c2c; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); width: 350px; text-align: center; }
+        h2 { color: #4CAF50; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; background: #3d3d3d; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #45a049; }
+        .switch-btn { color: #bbb; cursor: pointer; font-size: 14px; margin-top: 15px; display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; }
+        th, td { border: 1px solid #444; padding: 10px; }
+        th { background-color: #4CAF50; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="loginPage">
-        <h2>تسجيل دخول الطالب</h2>
-        <input type="text" id="studentCode" placeholder="كود الطالب">
-        <input type="password" id="studentPass" placeholder="كلمة السر">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" id="studentCode" placeholder="كود الطالب"> <input type="password" id="studentPass" placeholder="كلمة السر">
         <button onclick="login()">دخول</button>
-        <p id="loginError" class="error"></p>
-        <p>ليس لديك حساب؟ <span onclick="showRegister()" style="color:blue; cursor:pointer;">إنشاء حساب جديد</span></p>
+        <span class="switch-btn" onclick="showRegister()">إنشاء حساب جديد</span>
     </div>
 
     <div id="registerPage" style="display:none;">
-        <h2>إنشاء حساب جديد</h2>
-        <input type="text" id="regCode" placeholder="كود الطالب">
-        <input type="password" id="regPass" placeholder="اختر كلمة سر">
+        <h2>إنشاء حساب</h2>
+        <input type="text" id="regCode" placeholder="كود الطالب"> <input type="password" id="regPass" placeholder="اختر كلمة سر">
         <button onclick="register()">تسجيل</button>
-        <p id="regError" class="error"></p>
-        <p onclick="showLogin()" style="color:blue; cursor:pointer;">العودة لتسجيل الدخول</p>
+        <span class="switch-btn" onclick="showLogin()">العودة لتسجيل الدخول</span>
     </div>
 
     <div id="dataPage" style="display:none;">
-        <h2 id="welcomeMsg"></h2>
+        <h3 id="welcomeMsg"></h3>
         <table>
             <thead>
                 <tr>
@@ -47,8 +46,7 @@
             </thead>
             <tbody id="gradesTable"></tbody>
         </table>
-        <br>
-        <button onclick="logout()" style="background:#dc3545;">تسجيل خروج</button>
+        <button onclick="location.reload()" style="margin-top:20px; background:#f44336;">خروج</button>
     </div>
 </div>
 
@@ -61,14 +59,13 @@
         const pass = document.getElementById('regPass').value;
         let students = JSON.parse(localStorage.getItem('students')) || [];
         let student = students.find(s => s.code === code);
-
         if (student) {
-            student.password = pass; // حفظ الباسورد للكود الموجود
+            student.password = pass;
             localStorage.setItem('students', JSON.stringify(students));
-            alert("تم إنشاء الحساب بنجاح!");
+            alert("تم إنشاء الحساب!");
             showLogin();
         } else {
-            document.getElementById('regError').innerText = "هذا الكود غير مسجل في النظام!";
+            alert("الكود غير موجود بالسجل!");
         }
     }
 
@@ -77,23 +74,17 @@
         const pass = document.getElementById('studentPass').value;
         let students = JSON.parse(localStorage.getItem('students')) || [];
         let student = students.find(s => s.code === code && s.password === pass);
-
         if (student) {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dataPage').style.display = 'block';
-            document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
-            let tableContent = "";
-            student.grades.forEach(g => {
-                tableContent += `<tr><td>${g.subject}</td><td>${g.grade}</td></tr>`;
-            });
-            document.getElementById('gradesTable').innerHTML = tableContent;
+            document.getElementById('welcomeMsg').innerText = "أهلاً " + student.name;
+            let rows = "";
+            student.grades.forEach(g => { rows += `<tr><td>${g.subject}</td><td>${g.grade}</td></tr>`; });
+            document.getElementById('gradesTable').innerHTML = rows;
         } else {
-            document.getElementById('loginError').innerText = "الكود أو كلمة السر خطأ!";
+            alert("خطأ في الكود أو كلمة السر!");
         }
     }
-
-    function logout() { location.reload(); }
 </script>
-
 </body>
 </html>
