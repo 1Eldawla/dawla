@@ -2,202 +2,150 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم مستر الدولا | برمجة عمرو جابر</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة Eldawla | دخول الطالب</title>
     <style>
         :root { --primary: #7c3aed; --bg: #0b0e14; --card: #161b22; --text: #e6edf3; --accent: #00d2ff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; direction: rtl; }
-        .container { max-width: 1000px; margin: auto; }
-        .header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        
-        /* نظام التبويبات (الكتيجوري) */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .tab-btn { padding: 10px 20px; background: var(--card); border: 1px solid #30363d; color: white; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .tab-btn.active { background: var(--primary); border-color: var(--accent); box-shadow: 0 0 10px rgba(124, 58, 237, 0.5); }
-
-        .input-card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--primary); margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-        .input-card h3 { grid-column: 1/-1; margin-top: 0; color: var(--accent); text-align: center; }
-        
-        input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; font-size: 14px; }
-        .btn-add { background: var(--primary); cursor: pointer; grid-column: 1/-1; font-weight: bold; border: none; }
-        
-        .student-folder { background: var(--card); border: 1px solid #30363d; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-        .folder-header { padding: 15px; background: #1c2128; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-right: 4px solid var(--primary); }
-        .folder-content { display: none; padding: 15px; background: #0d1117; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; border: 1px solid #30363d; text-align: center; font-size: 13px; }
-        th { background: #1c2128; color: var(--accent); }
-        .btn-del { background: #ff4d4d; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background-color: var(--card); padding: 25px; border-radius: 12px; width: 95%; max-width: 650px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .welcome-box { background-color: #1c2128; border: 1px solid var(--primary); padding: 15px; border-radius: 10px; margin-bottom: 20px; color: var(--accent); font-size: 1.2rem; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; color: white; box-sizing: border-box; text-align: center; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: var(--primary); color: white; font-size: 16px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { opacity: 0.9; transform: scale(0.98); }
+        table { width: 100%; border-collapse: collapse; background-color: #0d1117; border-radius: 10px; overflow: hidden; margin-top: 15px; border: 1px solid #30363d; }
+        th { background-color: var(--primary); color: white; padding: 12px; font-size: 14px; }
+        td { padding: 12px; border-bottom: 1px solid #30363d; font-size: 14px; color: #e6edf3; }
+        .pay-ok { color: #4caf50; font-weight: bold; }
+        .pay-no { color: #f44336; font-weight: bold; }
+        .logout-btn { background-color: #30363d; color: white; margin-top: 20px; width: auto; padding: 10px 25px; border-radius: 8px; cursor: pointer; border: none; }
+        .switch-link { color: var(--accent); cursor: pointer; display: block; margin-top: 15px; text-decoration: underline; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>لوحة تحكم مستر الدولا 🎓</h1>
-        <p>برمجة: عمرو جابر</p>
+    <div id="loginPage">
+        <h2 style="color: var(--accent);">تسجيل دخول الطالب 🎓</h2>
+        <input type="text" id="studentCode" placeholder="كود الطالب"> 
+        <input type="password" id="studentPass" placeholder="كلمة السر">
+        <button onclick="login()">دخول للملف الشخصي</button>
+        <span class="switch-link" onclick="showRegister()">ليس لديك كلمة سر؟ (تفعيل الحساب)</span>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;">
-        <input type="text" id="newClassName" placeholder="اسم مجموعة جديدة">
-        <button onclick="addClass()" style="background: var(--accent); color: black; font-weight: bold;">+ إنشاء مجموعة</button>
+    <div id="registerPage" style="display:none;">
+        <h2 style="color: var(--accent);">تفعيل حساب جديد 📝</h2>
+        <p style="font-size: 0.8rem; color: #888;">ادخل الكود الذي استلمته من المستر واختر كلمة سر</p>
+        <input type="text" id="regCode" placeholder="كود الطالب">
+        <input type="password" id="regPass" placeholder="اختر كلمة سر جديدة">
+        <button onclick="register()" style="background-color: #238636;">تفعيل الحساب الآن</button>
+        <span class="switch-link" onclick="showLogin()">العودة للدخول</span>
     </div>
 
-    <div id="tabsList" class="tabs"></div>
-
-    <div class="input-card">
-        <h3>إضافة طالب في مجموعة: <span id="activeGroupName" style="color:var(--primary)">عام</span></h3>
-        <input type="text" id="sid" placeholder="كود الطالب">
-        <input type="text" id="sname" placeholder="اسم الطالب">
-        <input type="text" id="sexam" placeholder="اسم الامتحان">
-        <input type="number" id="sgrade" placeholder="الدرجة">
-        <input type="number" id="spay" placeholder="المبلغ">
-        <select id="spaid">
-            <option value="✅">دفع ✅</option>
-            <option value="❌">لم يدفع ❌</option>
-        </select>
-        <button class="btn-add" onclick="addNewData()">إضافة البيانات الآن</button>
+    <div id="dataPage" style="display:none;">
+        <div class="welcome-box" id="welcomeMsg"></div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الامتحان/الحصة</th>
+                        <th>الدرجة</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody id="gradesTable"></tbody>
+            </table>
+        </div>
+        <button class="logout-btn" onclick="location.reload()">تسجيل خروج</button>
     </div>
-
-    <div id="displayArea"></div>
 </div>
 
 <script>
-    // 1. البيانات الأساسية
-    let groups = JSON.parse(localStorage.getItem('groups')) || ["عام"];
-    let currentGroup = localStorage.getItem('currentGroup') || "عام";
-    let students = JSON.parse(localStorage.getItem('students')) || {};
-
-    // 2. تشغيل الصفحة
-    window.onload = () => {
-        renderTabs();
-        renderStudents();
-    };
-
-    // 3. وظيفة إضافة مجموعة
-    function addClass() {
-        let name = document.getElementById('newClassName').value.trim();
-        if (name && !groups.includes(name)) {
-            groups.push(name);
-            localStorage.setItem('groups', JSON.stringify(groups));
-            document.getElementById('newClassName').value = "";
-            renderTabs();
-        }
+    // التنقل بين الصفحات
+    function showRegister() { 
+        document.getElementById('loginPage').style.display='none'; 
+        document.getElementById('registerPage').style.display='block'; 
+    }
+    function showLogin() { 
+        document.getElementById('loginPage').style.display='block'; 
+        document.getElementById('registerPage').style.display='none'; 
     }
 
-    // 4. وظيفة رسم التبويبات
-    function renderTabs() {
-        const tabsList = document.getElementById('tabsList');
-        tabsList.innerHTML = groups.map(g => `
-            <button class="tab-btn ${g === currentGroup ? 'active' : ''}" onclick="selectGroup('${g}')">${g}</button>
-        `).join('');
-        document.getElementById('activeGroupName').innerText = currentGroup;
-    }
+    // وظيفة تسجيل الدخول
+    function login() {
+        const id = document.getElementById('studentCode').value.trim();
+        const pass = document.getElementById('studentPass').value.trim();
 
-    function selectGroup(name) {
-        currentGroup = name;
-        localStorage.setItem('currentGroup', name);
-        renderTabs();
-        renderStudents();
-    }
-
-    // 5. وظيفة إضافة البيانات
-    function addNewData() {
-        const id = document.getElementById('sid').value.trim();
-        const name = document.getElementById('sname').value.trim();
-        
-        if (!id || !name) return alert("دخل الكود والاسم يا هندسة");
-
-        // إذا الطالب مش موجود، ننشئه ونربطه بالمجموعة الحالية فوراً
-        if (!students[id]) {
-            students[id] = {
-                name: name,
-                group: currentGroup, // الربط هنا بالكتيجوري
-                history: []
-            };
+        // دخول الأدمن السريع
+        if (id === "Dawla" && pass === "123400") {
+            window.location.href = "admin.html";
+            return;
         }
 
-        // إضافة الحصة
-        students[id].history.push({
-            date: new Date().toLocaleDateString('ar-EG'),
-            exam: document.getElementById('sexam').value || "حصة",
-            grade: document.getElementById('sgrade').value || "0",
-            pay: document.getElementById('spay').value || "0",
-            paid: document.getElementById('spaid').value
-        });
-
-        localStorage.setItem('students', JSON.stringify(students));
-        alert("تم الحفظ في مجموعة " + currentGroup);
+        let students = JSON.parse(localStorage.getItem('students')) || {};
+        let student = students[id];
         
-        // مسح الخانات
-        document.getElementById('sid').value = "";
-        document.getElementById('sname').value = "";
-        
-        renderStudents();
-    }
-
-    // 6. وظيفة العرض (التي كانت تسبب المشكلة)
-    function renderStudents() {
-        const area = document.getElementById('displayArea');
-        area.innerHTML = "";
-        let hasData = false;
-
-        for (let id in students) {
-            // شرط العرض: لازم المجموعة تساوي المجموعة النشطة
-            if (students[id].group === currentGroup) {
-                hasData = true;
-                let rows = students[id].history.map((h, index) => `
-                    <tr>
-                        <td>${h.date}</td>
-                        <td>${h.exam}</td>
-                        <td>${h.grade}</td>
-                        <td>${h.pay}</td>
-                        <td>${h.paid}</td>
-                        <td><button class="btn-del" onclick="deleteHistory('${id}', ${index})">حذف</button></td>
-                    </tr>
-                `).reverse().join('');
-
-                area.innerHTML += `
-                    <div class="student-folder">
-                        <div class="folder-header" onclick="toggle('${id}')">
-                            <span>📂 <b>${students[id].name}</b> (كود: ${id})</span>
-                            <span>${students[id].history.length} حصص ▼</span>
-                        </div>
-                        <div id="content-${id}" class="folder-content">
-                            <table>
-                                <thead>
-                                    <tr><th>التاريخ</th><th>الامتحان</th><th>الدرجة</th><th>المبلغ</th><th>الحالة</th><th>حذف</th></tr>
-                                </thead>
-                                <tbody>${rows}</tbody>
-                            </table>
-                            <button onclick="deleteStudent('${id}')" style="background:red; color:white; border:none; margin-top:10px; padding:5px; border-radius:5px; cursor:pointer;">حذف الطالب نهائياً</button>
-                        </div>
-                    </div>
-                `;
+        if (student) {
+            if (student.password === "") {
+                alert("حسابك موجود ولكن غير مفعل. من فضلك اضغط على 'تفعيل الحساب' واختر كلمة سر.");
+                return;
             }
+
+            if (student.password === pass) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dataPage').style.display = 'block';
+                document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
+                
+                let rows = "";
+                let history = student.history || [];
+                
+                if(history.length === 0) {
+                    rows = "<tr><td colspan='5'>لا توجد حصص مسجلة لك حتى الآن</td></tr>";
+                } else {
+                    // عرض من الأحدث للأقدم
+                    [...history].reverse().forEach(h => {
+                        let statusIcon = h.paid === "✅" ? "✅" : "❌";
+                        let payClass = h.paid === "✅" ? "pay-ok" : "pay-no";
+                        
+                        rows += `<tr>
+                            <td>${h.date}</td>
+                            <td>${h.exam || "حصة"}</td>
+                            <td style="color:var(--accent); font-weight:bold;">${h.grade}</td>
+                            <td>${h.pay} ج.م</td>
+                            <td class="${payClass}">${statusIcon}</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('gradesTable').innerHTML = rows;
+            } else {
+                alert("كلمة السر غير صحيحة!");
+            }
+        } else {
+            alert("هذا الكود غير مسجل. تأكد من الكود أو راجع المستر.");
+        }
+    }
+
+    // وظيفة تفعيل الحساب
+    function register() {
+        const id = document.getElementById('regCode').value.trim();
+        const pass = document.getElementById('regPass').value.trim();
+        
+        if(!id || !pass) {
+            alert("برجاء إدخال الكود وكلمة السر");
+            return;
         }
 
-        if (!hasData) area.innerHTML = "<p style='text-align:center; opacity:0.5;'>لا يوجد طلاب في مجموعة " + currentGroup + "</p>";
-    }
+        let students = JSON.parse(localStorage.getItem('students')) || {};
 
-    function toggle(id) {
-        let el = document.getElementById('content-' + id);
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-    }
-
-    function deleteHistory(id, index) {
-        if(confirm("تحذف الحصة؟")) {
-            students[id].history.splice(index, 1);
+        if (students[id]) {
+            students[id].password = pass; // حفظ كلمة السر للطالب
             localStorage.setItem('students', JSON.stringify(students));
-            renderStudents();
-        }
-    }
-
-    function deleteStudent(id) {
-        if(confirm("تحذف الطالب كله؟")) {
-            delete students[id];
-            localStorage.setItem('students', JSON.stringify(students));
-            renderStudents();
+            alert("تم تفعيل حسابك بنجاح! يمكنك الآن تسجيل الدخول.");
+            showLogin();
+        } else {
+            alert("عذراً، هذا الكود غير موجود في سجلات المستر. تأكد من كتابة الكود صح.");
         }
     }
 </script>
