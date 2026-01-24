@@ -6,16 +6,15 @@
     <title>منصة Eldawla | طالب</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e14; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background-color: #161b22; padding: 25px; border-radius: 12px; width: 95%; max-width: 600px; text-align: center; border: 1px solid #30363d; }
+        .container { background-color: #161b22; padding: 25px; border-radius: 12px; width: 95%; max-width: 700px; text-align: center; border: 1px solid #30363d; }
         .welcome-box { background-color: #1c2128; border: 1px solid #30363d; padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #00d2ff; font-size: 1.2rem; font-weight: bold; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; color: white; box-sizing: border-box; text-align: center; font-size: 16px; }
         button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #238636; color: white; font-size: 16px; cursor: pointer; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; background-color: #161b22; border-radius: 10px; overflow: hidden; margin-top: 10px; border: 1px solid #30363d; }
-        th { background-color: #8a2be2; color: white; padding: 12px; font-size: 14px; }
+        th { background-color: #7c3aed; color: white; padding: 12px; font-size: 14px; }
         td { padding: 12px; border-bottom: 1px solid #30363d; font-size: 14px; background-color: #0d1117; color: #e6edf3; }
         .pay-ok { color: #4caf50; font-weight: bold; }
         .pay-no { color: #f44336; font-weight: bold; }
-        .locked-msg { color: #f44336; padding: 20px; font-weight: bold; }
         .logout-btn { background-color: #30363d; color: white; margin-top: 20px; width: auto; padding: 10px 25px; border-radius: 8px; cursor: pointer; border: none; }
         .switch-link { color: #58a6ff; cursor: pointer; display: block; margin-top: 15px; text-decoration: none; }
     </style>
@@ -23,16 +22,16 @@
 <body>
 <div class="container">
     <div id="loginPage">
-        <h2 style="color: #00d2ff;">تسجيل الدخول 🎓</h2>
+        <h2 style="color: #00d2ff;">تسجيل دخول الطالب 🎓</h2>
         <input type="text" id="studentCode" placeholder="كود الطالب"> 
         <input type="password" id="studentPass" placeholder="كلمة السر">
         <button onclick="login()">دخول</button>
-        <span class="switch-link" onclick="showRegister()">إنشاء حساب جديد</span>
+        <span class="switch-link" onclick="showRegister()">إنشاء حساب (تفعيل الكود)</span>
     </div>
 
     <div id="registerPage" style="display:none;">
-        <h2 style="color: #00d2ff;">تفعيل حساب الطالب 📝</h2>
-        <input type="text" id="regCode" placeholder="كود الطالب المعطى لك">
+        <h2 style="color: #00d2ff;">تفعيل حساب جديد 📝</h2>
+        <input type="text" id="regCode" placeholder="كود الطالب">
         <input type="password" id="regPass" placeholder="اختر كلمة سر">
         <button onclick="register()">تفعيل الآن</button>
         <span class="switch-link" onclick="showLogin()">العودة للدخول</span>
@@ -45,8 +44,8 @@
                 <thead>
                     <tr>
                         <th>التاريخ</th>
+                        <th>الموضوع/الامتحان</th>
                         <th>الدرجة</th>
-                        <th>المستوى</th>
                         <th>المبلغ</th>
                         <th>الحالة</th>
                     </tr>
@@ -66,6 +65,7 @@
         const id = document.getElementById('studentCode').value.trim();
         const pass = document.getElementById('studentPass').value.trim();
 
+        // دخول الأدمن (المستر)
         if (id === "Dawla" && pass === "123400") {
             window.location.href = "admin.html";
             return;
@@ -75,12 +75,6 @@
         let student = students[id];
         
         if (student && student.password === pass) {
-            // التحقق من القفل
-            if(student.isLocked) {
-                alert("ملفك مغلق حالياً، راجع المستر.");
-                return;
-            }
-
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dataPage').style.display = 'block';
             document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
@@ -89,22 +83,23 @@
             let history = student.history || [];
             
             if(history.length === 0) {
-                rows = "<tr><td colspan='5'>لا توجد حصص مسجلة لك بعد</td></tr>";
+                rows = "<tr><td colspan='5'>لا توجد بيانات مسجلة لك بعد</td></tr>";
             } else {
-                history.forEach(h => {
+                // عرض التاريخ من الأحدث للأقدم
+                [...history].reverse().forEach(h => {
                     let payStatusClass = h.paidStatus === "✅" ? "pay-ok" : "pay-no";
                     rows += `<tr>
                         <td>${h.date}</td>
-                        <td>${h.grade}</td>
-                        <td>${h.level}</td>
-                        <td class="${payStatusClass}">${h.pay} ج.م</td>
-                        <td>${h.paidStatus} حاضر</td>
+                        <td>${h.examName || "حصة"}</td>
+                        <td style="color:#00d2ff; font-weight:bold;">${h.grade}</td>
+                        <td>${h.pay} ج.م</td>
+                        <td class="${payStatusClass}">${h.paidStatus}</td>
                     </tr>`;
                 });
             }
             document.getElementById('gradesTable').innerHTML = rows;
         } else { 
-            alert("الكود أو كلمة السر خطأ!"); 
+            alert("الكود أو كلمة السر خطأ، أو ربما لم تفعل حسابك بعد!"); 
         }
     }
 
@@ -116,10 +111,10 @@
         if (students[id]) {
             students[id].password = pass;
             localStorage.setItem('students', JSON.stringify(students));
-            alert("تم تفعيل حسابك بنجاح!");
+            alert("تم تفعيل حسابك بنجاح! يمكنك الدخول الآن.");
             showLogin();
         } else { 
-            alert("عذراً، كود الطالب هذا غير مسجل في قاعدة بيانات المستر!"); 
+            alert("هذا الكود غير موجود! تأكد أن المستر أضافك في لوحة التحكم أولاً."); 
         }
     }
 </script>
