@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم مستر الدولا | برمجة عمرو جابر</title>
     <style>
         :root { --primary: #7c3aed; --bg: #0b0e14; --card: #161b22; --text: #e6edf3; --accent: #00d2ff; }
@@ -14,17 +15,17 @@
         .btn-create { background: var(--accent); color: #000; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
-        .tab-btn { padding: 12px 25px; background: var(--card); border: 1px solid #30363d; color: white; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .tab-btn { padding: 12px 25px; background: var(--card); border: 1px solid #30363d; color: white; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; position: relative; }
         .tab-btn.active { background: var(--primary); border-color: var(--accent); box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
+        .del-class { color: #ff4d4d; font-weight: bold; margin-right: 10px; cursor: pointer; }
 
         .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; border: 1px solid var(--primary); }
         .input-card h3 { grid-column: 1/-1; margin: 0 0 10px; color: var(--accent); text-align: center; }
-        input, select { padding: 12px; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: white; outline: none; }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: white; outline: none; width: 100%; box-sizing: border-box; }
         
         .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; grid-column: 1 / -1; font-size: 16px; transition: 0.3s; }
         .btn-add:hover { opacity: 0.9; transform: scale(0.99); }
 
-        /* ستايل الكراسة / الفولدر */
         .student-folder { background: var(--card); border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; overflow: hidden; border-right: 5px solid var(--primary); }
         .folder-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1c2128; }
         .folder-content { display: none; padding: 15px; background: #0d1117; }
@@ -34,8 +35,7 @@
         th { color: var(--accent); font-size: 0.9rem; }
         .btn-del { background: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
 
-        /* إمضاء المطور عمرو جابر */
-        .dev-footer { position: fixed; bottom: 15px; left: 0; right: 0; text-align: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); letter-spacing: 2px; z-index: -1; pointer-events: none; transition: 0.5s; }
+        .dev-footer { position: fixed; bottom: 15px; left: 0; right: 0; text-align: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); letter-spacing: 2px; pointer-events: none; transition: 0.5s; }
         body:hover .dev-footer { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
     </style>
 </head>
@@ -43,48 +43,51 @@
     <div class="container">
         <div class="header">
             <h1>لوحة تحكم مستر الدولا 🎓</h1>
-            <p>نظام الإدارة الذكي للطلاب</p>
+            <p>نظام الإدارة الذكي للطلاب - برمجة عمرو جابر</p>
         </div>
 
         <div class="class-manager">
-            <input type="text" id="newClassName" placeholder="اسم المجموعة الجديدة (مثلاً: تالته اعدادي)">
+            <input type="text" id="newClassName" placeholder="اسم المجموعة الجديدة">
             <button class="btn-create" onclick="createClass()">+ إنشاء مجموعة</button>
         </div>
 
         <div id="tabsContainer" class="tabs"></div>
 
         <div class="input-card">
-            <h3>إضافة بيانات في: <span id="activeClassNameText" style="color:var(--accent)">عام</span></h3>
+            <h3>إضافة بيانات في: <span id="activeClassNameText" style="color:var(--accent)">...</span></h3>
             <input type="text" id="sid" placeholder="كود الطالب">
             <input type="text" id="sname" placeholder="اسم الطالب">
+            <input type="text" id="sexam_name" placeholder="اسم الامتحان">
             <input type="number" id="sgrade" placeholder="الدرجة">
-            <input type="text" id="sexam_name" placeholder="اسم الامتحان / الحصة">
             <input type="number" id="spay" placeholder="المبلغ">
             <select id="spaid">
                 <option value="✅">دفع ✅</option>
                 <option value="❌">لم يدفع ❌</option>
             </select>
-            <button class="btn-add" onclick="saveData()">إضافة البيانات للملف</button>
+            <button class="btn-add" onclick="saveData()">إضافة الحصة للملف</button>
         </div>
 
         <div id="studentsList"></div>
 
-        <div class="dev-footer">
-            DEVELOPED BY: AMR GABER
-        </div>
+        <div class="dev-footer">DEVELOPED BY: AMR GABER</div>
     </div>
 
     <script>
         let myClasses = JSON.parse(localStorage.getItem('myClasses')) || ["عام"];
-        let currentClass = localStorage.getItem('lastClass') || myClasses[0];
+        let currentClass = localStorage.getItem('lastClass') || "عام";
+
+        // التأكد أن المجموعة الحالية موجودة في القائمة
+        if (!myClasses.includes(currentClass)) currentClass = myClasses[0];
 
         window.onload = () => updateUI();
 
         function createClass() {
             const name = document.getElementById('newClassName').value.trim();
             if(!name) return;
-            if(!myClasses.includes(name)) myClasses.push(name);
-            localStorage.setItem('myClasses', JSON.stringify(myClasses));
+            if(!myClasses.includes(name)) {
+                myClasses.push(name);
+                localStorage.setItem('myClasses', JSON.stringify(myClasses));
+            }
             document.getElementById('newClassName').value = "";
             switchClass(name);
         }
@@ -96,8 +99,8 @@
         }
 
         function updateUI() {
-            // تحديث التبويبات
-            document.getElementById('tabsContainer').innerHTML = myClasses.map(c => `
+            const tabsCont = document.getElementById('tabsContainer');
+            tabsCont.innerHTML = myClasses.map(c => `
                 <div class="tab-btn ${currentClass === c ? 'active' : ''}" onclick="switchClass('${c}')">
                     ${c}
                 </div>
@@ -114,12 +117,16 @@
 
             let students = JSON.parse(localStorage.getItem('students')) || {};
             
-            // لو الطالب مش موجود، ننشئه ونربطه بالمجموعة الحالية
+            // تحديث أو إنشاء الطالب
             if(!students[id]) {
-                students[id] = { name: name, levelClass: currentClass, history: [] };
+                students[id] = { 
+                    name: name, 
+                    levelClass: currentClass, 
+                    history: [],
+                    password: "" 
+                };
             }
 
-            // إضافة الحصة للسجل
             students[id].history.push({
                 date: new Date().toLocaleDateString('ar-EG'),
                 grade: document.getElementById('sgrade').value || "0",
@@ -130,13 +137,14 @@
 
             localStorage.setItem('students', JSON.stringify(students));
             
-            // مسح الخانات بعد الحفظ
+            // تفريغ المدخلات
             document.getElementById('sid').value = "";
             document.getElementById('sname').value = "";
             document.getElementById('sgrade').value = "";
+            document.getElementById('sexam_name').value = "";
             
-            alert("تمت الإضافة بنجاح!");
-            renderAdmin(); // إعادة الرسم فوراً
+            alert("تمت الإضافة بنجاح في مجموعة " + currentClass);
+            renderAdmin();
         }
 
         function renderAdmin() {
@@ -144,12 +152,12 @@
             const container = document.getElementById('studentsList');
             container.innerHTML = '';
             
-            let found = false;
+            let count = 0;
             for(let id in students) {
-                // فلترة الطلاب حسب المجموعة النشطة حالياً
+                // عرض الطلاب التابعين للمجموعة المختارة فقط
                 if(students[id].levelClass === currentClass) {
-                    found = true;
-                    let rows = students[id].history.map((h, i) => `
+                    count++;
+                    let rows = (students[id].history || []).map((h, i) => `
                         <tr>
                             <td>${h.date}</td>
                             <td>${h.examName}</td>
@@ -163,23 +171,24 @@
                     container.innerHTML += `
                     <div class="student-folder">
                         <div class="folder-header" onclick="toggleFolder('folder-${id}')">
-                            <span>📁 <b>${students[id].name}</b> (${id})</span>
-                            <span style="background:var(--primary); padding:2px 8px; border-radius:10px; font-size:0.7rem;">
-                                ${students[id].history.length} حصص
-                            </span>
+                            <span>📁 <b>${students[id].name}</b> <small>(#${id})</small></span>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span style="background:var(--primary); padding:2px 10px; border-radius:20px; font-size:0.7rem;">${students[id].history.length} سجلات</span>
+                                <button class="btn-del" onclick="event.stopPropagation(); deleteStudent('${id}')">حذف الطالب</button>
+                            </div>
                         </div>
                         <div id="folder-${id}" class="folder-content">
                             <table>
                                 <thead>
                                     <tr><th>التاريخ</th><th>الامتحان</th><th>الدرجة</th><th>المبلغ</th><th>الحالة</th><th>حذف</th></tr>
                                 </thead>
-                                <tbody>${rows}</tbody>
+                                <tbody>${rows || '<tr><td colspan="6">لا يوجد سجلات</td></tr>'}</tbody>
                             </table>
                         </div>
                     </div>`;
                 }
             }
-            if(!found) container.innerHTML = `<p style="text-align:center; opacity:0.5;">لا يوجد طلاب في هذه المجموعة بعد.</p>`;
+            if(count === 0) container.innerHTML = `<p style="text-align:center; opacity:0.5; margin-top:30px;">المجموعة (${currentClass}) فارغة حالياً.</p>`;
         }
 
         function toggleFolder(id) {
@@ -191,6 +200,14 @@
             if(!confirm("حذف هذه الحصة؟")) return;
             let students = JSON.parse(localStorage.getItem('students'));
             students[id].history.splice(index, 1);
+            localStorage.setItem('students', JSON.stringify(students));
+            renderAdmin();
+        }
+
+        function deleteStudent(id) {
+            if(!confirm("هل أنت متأكد من حذف الطالب نهائياً؟")) return;
+            let students = JSON.parse(localStorage.getItem('students'));
+            delete students[id];
             localStorage.setItem('students', JSON.stringify(students));
             renderAdmin();
         }
