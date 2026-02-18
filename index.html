@@ -35,7 +35,6 @@
 
     <div id="registerPage" style="display:none;">
         <h2 style="color: var(--accent);">تفعيل الحساب لأول مرة 📝</h2>
-        <p style="font-size: 0.8rem; color: #8b949e;">أدخل الكود الذي استلمته من المستر لإنشاء كلمة سر</p>
         <input type="text" id="regCode" placeholder="كود الطالب">
         <input type="password" id="regPass" placeholder="اختر كلمة سر جديدة">
         <button onclick="register()" style="background-color: var(--primary);">تفعيل الحساب الآن</button>
@@ -64,12 +63,9 @@
 </div>
 
 <script>
-    // عند تحميل الصفحة، نتحقق هل الطالب مسجل دخول مسبقاً؟
     window.onload = function() {
         const savedStudentId = localStorage.getItem('loggedStudentId');
-        if (savedStudentId) {
-            loadStudentData(savedStudentId);
-        }
+        if (savedStudentId) loadStudentData(savedStudentId);
     };
 
     function showRegister() { document.getElementById('loginPage').style.display='none'; document.getElementById('registerPage').style.display='block'; }
@@ -79,7 +75,9 @@
         const id = document.getElementById('studentCode').value.trim();
         const pass = document.getElementById('studentPass').value.trim();
 
+        // دخول الأدمن (مستر الدولا)
         if (id === "Dawla" && pass === "123400") {
+            sessionStorage.setItem('adminToken', 'SecureAccess_True');
             window.location.href = "admin.html";
             return;
         }
@@ -88,21 +86,17 @@
         let student = students[id];
         
         if (student && student.password === pass) {
-            localStorage.setItem('loggedStudentId', id); // حفظ الجلسة
+            localStorage.setItem('loggedStudentId', id);
             loadStudentData(id);
         } else { 
-            alert("الكود أو كلمة السر خطأ، أو ربما لم تقم بتفعيل حسابك بعد!"); 
+            alert("الكود أو كلمة السر خطأ!"); 
         }
     }
 
     function loadStudentData(id) {
         let students = JSON.parse(localStorage.getItem('students')) || {};
         let student = students[id];
-
-        if (!student) {
-            logout();
-            return;
-        }
+        if (!student) { logout(); return; }
 
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('registerPage').style.display = 'none';
@@ -113,17 +107,17 @@
         let history = student.history || [];
         
         if(history.length === 0) {
-            rows = "<tr><td colspan='6'>لا توجد بيانات مسجلة لك حتى الآن</td></tr>";
+            rows = "<tr><td colspan='6'>لا توجد بيانات مسجلة</td></tr>";
         } else {
             [...history].reverse().forEach(h => {
-                let payStatusClass = h.paidStatus === "✅" ? "pay-ok" : "pay-no";
+                let payStatusClass = (h.paidStatus === "✅" || h.paidStatus === "حاضر ✅") ? "pay-ok" : "pay-no";
                 rows += `<tr>
                     <td>${h.date}</td>
                     <td style="color:var(--accent)">${h.examName || "حصة"}</td>
-                    <td style="font-weight:bold;">${h.grade}</td>
-                    <td class="level-badge">${h.level || "---"}</td>
-                    <td class="${payStatusClass}">${h.pay} ج.م</td>
-                    <td>${h.paidStatus}</td>
+                    <td style="font-weight:bold;">${h.grade || "0"}</td>
+                    <td class="level-badge">${h.level && h.level !== "undefined" ? h.level : "---"}</td>
+                    <td class="${payStatusClass}">${h.pay || "0"} ج.م</td>
+                    <td>${h.paidStatus || "❌"}</td>
                 </tr>`;
             });
         }
@@ -133,23 +127,18 @@
     function register() {
         const id = document.getElementById('regCode').value.trim();
         const pass = document.getElementById('regPass').value.trim();
-        
         if(!id || !pass) return alert("برجاء ملء جميع الخانات!");
-
         let students = JSON.parse(localStorage.getItem('students')) || {};
-
         if (students[id]) {
             students[id].password = pass;
             localStorage.setItem('students', JSON.stringify(students));
-            alert("تم تفعيل حسابك بنجاح! يمكنك الآن تسجيل الدخول.");
+            alert("تم التفعيل! سجل دخولك الآن.");
             showLogin();
-        } else { 
-            alert("عذراً، هذا الكود غير موجود! تأكد أن المستر قد قام بإضافتك أولاً."); 
-        }
+        } else { alert("الكود غير موجود!"); }
     }
 
     function logout() {
-        localStorage.removeItem('loggedStudentId'); // حذف الجلسة
+        localStorage.removeItem('loggedStudentId');
         location.reload();
     }
 </script>
