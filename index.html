@@ -2,167 +2,77 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة مستر الدولا | النظام المتكامل</title>
+    <title>منصة الدولا النهائية</title>
     <style>
-        :root { --primary: #7c3aed; --bg: #0b0e14; --card: #161b22; --accent: #00d2ff; --text: #f8fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; min-height: 100vh; }
-        .container { max-width: 800px; margin: auto; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #30363d; margin-bottom: 20px; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0d1117; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        .admin-btn { background: #238636; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0d1117; border-radius: 10px; overflow: hidden; }
-        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #30363d; }
-        th { background: var(--primary); color: white; }
-        .level-badge { color: #ffcc00; font-weight: bold; }
+        body { font-family: sans-serif; background: #0b0e14; color: white; text-align: center; padding: 50px; }
+        .box { background: #161b22; padding: 30px; border-radius: 15px; display: inline-block; border: 1px solid #30363d; }
+        input { display: block; width: 250px; padding: 10px; margin: 10px auto; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; background: #238636; color: white; border: none; border-radius: 5px; cursor: pointer; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="loginSection" class="card">
-        <h1 style="color:var(--accent)">مرحباً بك في منصة الدولا 🎓</h1>
-        <input type="text" id="userCode" placeholder="كود الطالب">
-        <input type="password" id="userPass" placeholder="كلمة السر">
-        <button onclick="handleLogin()">دخول للمنصة</button>
-        <p style="font-size: 0.8rem; color: #8b949e; margin-top: 15px;">للأدمن: ادخل بكود Dawla وباسورد 123400</p>
+    <div id="loginBox" class="box">
+        <h2>تسجيل دخول 🎓</h2>
+        <input type="text" id="u" placeholder="الكود">
+        <input type="password" id="p" placeholder="الباسورد">
+        <button onclick="go()">دخول</button>
     </div>
 
-    <div id="adminSection" class="card hidden">
-        <h2 style="color:var(--accent)">لوحة تحكم مستر الدولا 🛡️</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input type="text" id="sId" placeholder="كود الطالب الجديد">
-            <input type="text" id="sName" placeholder="اسم الطالب">
-            <input type="text" id="sExam" placeholder="الامتحان / الحصة">
-            <input type="number" id="sGrade" placeholder="الدرجة">
-            <input type="number" id="sPay" placeholder="المبلغ">
-            <select id="sLevel">
-                <option value="ممتاز ⭐⭐⭐">ممتاز ⭐⭐⭐</option>
-                <option value="جيد جداً ⭐⭐">جيد جداً ⭐⭐</option>
-                <option value="جيد ⭐">جيد ⭐</option>
-                <option value="ضعيف ⚠️">ضعيف ⚠️</option>
-            </select>
-            <select id="sPaid">
-                <option value="حاضر ✅">حاضر ✅</option>
-                <option value="غائب ❌">غائب ❌</option>
-            </select>
-        </div>
-        <button class="admin-btn" onclick="addStudentData()">إضافة البيانات الآن</button>
-        <button onclick="logout()" style="background:#ef4444; margin-top:10px;">خروج</button>
-        <div id="adminList"></div>
+    <div id="adminBox" class="box hidden">
+        <h2 style="color: #00d2ff;">لوحة التحكم (مستر الدولا)</h2>
+        <input type="text" id="sId" placeholder="كود الطالب">
+        <input type="text" id="sName" placeholder="اسمه">
+        <input type="text" id="sExam" placeholder="الامتحان">
+        <select id="sLevel">
+            <option>ممتاز ⭐⭐⭐</option>
+            <option>جيد جداً ⭐⭐</option>
+            <option>جيد ⭐</option>
+            <option>ضعيف ⚠️</option>
+        </select>
+        <button onclick="add()">إضافة بيانات</button>
+        <button onclick="location.reload()" style="background: red;">خروج</button>
+        <div id="list" style="margin-top: 20px; text-align: right;"></div>
     </div>
 
-    <div id="studentSection" class="card hidden">
-        <h2 id="studentWelcome" style="color:var(--accent)"></h2>
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>الامتحان</th>
-                        <th>الدرجة</th>
-                        <th>المستوى</th>
-                        <th>الحالة</th>
-                    </tr>
-                </thead>
-                <tbody id="studentTableBody"></tbody>
-            </table>
-        </div>
-        <button onclick="logout()" style="background:#ef4444; margin-top:20px;">تسجيل خروج</button>
-    </div>
-</div>
+    <script>
+        let data = JSON.parse(localStorage.getItem('my_students')) || {};
 
-<script>
-    let students = JSON.parse(localStorage.getItem('dawla_data')) || {};
-
-    function handleLogin() {
-        const id = document.getElementById('userCode').value.trim();
-        const pass = document.getElementById('userPass').value.trim();
-
-        if (id === "Dawla" && pass === "123400") {
-            showSection('adminSection');
-            renderAdminList();
-        } else if (students[id] && (students[id].password === pass || !students[id].password)) {
-            // لو أول مرة يدخل، الباسورد اللي هيكتبه هيبقى هو بتاعه
-            if(!students[id].password) {
-                students[id].password = pass;
-                localStorage.setItem('dawla_data', JSON.stringify(students));
+        function go() {
+            let u = document.getElementById('u').value;
+            let p = document.getElementById('p').value;
+            
+            if(u === "Dawla" && p === "123400") {
+                document.getElementById('loginBox').classList.add('hidden');
+                document.getElementById('adminBox').classList.remove('hidden');
+                show();
+            } else {
+                alert("بيانات غلط!");
             }
-            showSection('studentSection');
-            renderStudentProfile(id);
-        } else {
-            alert("بيانات الدخول غير صحيحة!");
         }
-    }
 
-    function addStudentData() {
-        const id = document.getElementById('sId').value.trim();
-        const name = document.getElementById('sName').value.trim();
-        if(!id || !name) return alert("دخل الكود والاسم!");
-
-        if(!students[id]) students[id] = { name: name, password: "", history: [] };
-        
-        students[id].history.push({
-            date: new Date().toLocaleDateString('ar-EG'),
-            exam: document.getElementById('sExam').value || "حصة عامة",
-            grade: document.getElementById('sGrade').value || "0",
-            level: document.getElementById('sLevel').value,
-            paid: document.getElementById('sPaid').value
-        });
-
-        localStorage.setItem('dawla_data', JSON.stringify(students));
-        alert("تم الحفظ بنجاح!");
-        renderAdminList();
-    }
-
-    function renderAdminList() {
-        const list = document.getElementById('adminList');
-        list.innerHTML = '<h3 style="margin-top:20px;">الطلاب المسجلين:</h3>';
-        for(let id in students) {
-            list.innerHTML += `<div style="background:#0d1117; padding:10px; margin:5px; border-radius:5px; display:flex; justify-content:space-between;">
-                <span>${students[id].name} (${id})</span>
-                <button onclick="deleteStudent('${id}')" style="width:auto; padding:5px 10px; background:#ef4444;">حذف</button>
-            </div>`;
+        function add() {
+            let id = document.getElementById('sId').value;
+            let name = document.getElementById('sName').value;
+            if(!data[id]) data[id] = { name: name, history: [] };
+            data[id].history.push({
+                date: new Date().toLocaleDateString('ar-EG'),
+                exam: document.getElementById('sExam').value,
+                level: document.getElementById('sLevel').value
+            });
+            localStorage.setItem('my_students', JSON.stringify(data));
+            alert("تم الحفظ!");
+            show();
         }
-    }
 
-    function renderStudentProfile(id) {
-        const student = students[id];
-        document.getElementById('studentWelcome').innerText = "أهلاً بك يا " + student.name;
-        const tbody = document.getElementById('studentTableBody');
-        tbody.innerHTML = "";
-        
-        [...student.history].reverse().forEach(h => {
-            tbody.innerHTML += `<tr>
-                <td>${h.date}</td>
-                <td>${h.exam}</td>
-                <td>${h.grade}</td>
-                <td class="level-badge">${h.level || "---"}</td>
-                <td>${h.paid}</td>
-            </tr>`;
-        });
-    }
-
-    function deleteStudent(id) {
-        if(confirm("هل تريد حذف هذا الطالب؟")) {
-            delete students[id];
-            localStorage.setItem('dawla_data', JSON.stringify(students));
-            renderAdminList();
+        function show() {
+            let list = document.getElementById('list');
+            list.innerHTML = "";
+            for(let id in data) {
+                list.innerHTML += `<p>✅ ${data[id].name} (${id}) - آخر مستوى: ${data[id].history.slice(-1)[0].level}</p>`;
+            }
         }
-    }
-
-    function showSection(sectionId) {
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('adminSection').classList.add('hidden');
-        document.getElementById('studentSection').classList.add('hidden');
-        document.getElementById(sectionId).classList.remove('hidden');
-    }
-
-    function logout() { location.reload(); }
-</script>
-
+    </script>
 </body>
 </html>
