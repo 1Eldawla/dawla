@@ -8,6 +8,7 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; min-height: 100vh; position: relative; padding-bottom: 80px; }
         .container { max-width: 1100px; margin: auto; }
         
+        /* زر الإصلاح السريع من الكود الثاني */
         .fix-btn { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; transition: 0.3s; }
         .fix-btn:hover { background: #b91c1c; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
 
@@ -22,11 +23,12 @@
         .tab-btn { padding: 12px 25px; background: var(--card); border: 1px solid #334155; color: white; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
         .tab-btn.active { background: var(--primary); border-color: var(--accent); box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
 
-        .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; border: 2px solid var(--primary); position: relative; }
+        .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; border: 2px solid var(--primary); position: relative; }
         .input-card h3 { grid-column: 1/-1; margin: 0; color: var(--accent); text-align: center; margin-bottom: 10px; }
         
         input, select { padding: 12px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
         
+        /* نظام البحث السريع */
         .search-results { position: absolute; top: 120px; right: 25px; width: 220px; background: #1e293b; border: 1px solid var(--accent); z-index: 100; border-radius: 10px; display: none; max-height: 150px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #334155; }
         .search-item:hover { background: var(--primary); }
@@ -34,6 +36,7 @@
         .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; grid-column: 1 / -1; font-size: 1.1rem; transition: 0.3s; }
         .btn-add:hover { opacity: 0.9; transform: translateY(-2px); }
 
+        /* كروت الطلاب (فولدرات) */
         .student-folder { background: var(--card); border-radius: 20px; margin-bottom: 15px; border-right: 6px solid var(--primary); overflow: hidden; transition: 0.3s; }
         .folder-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #242f42; }
         .folder-content { display: none; padding: 20px; background: #161b22; }
@@ -76,17 +79,8 @@
             
             <input type="text" id="sid" placeholder="الكود">
             <input type="text" id="sname" placeholder="اسم الطالب">
-            <input type="text" id="sexam_name" placeholder="الامتحان">
             <input type="number" id="sgrade" placeholder="الدرجة">
-            
-            <select id="slevel">
-                <option value="" disabled selected>تحديد المستوى</option>
-                <option value="ممتاز ⭐⭐⭐">ممتاز ⭐⭐⭐</option>
-                <option value="جيد جداً ⭐⭐">جيد جداً ⭐⭐</option>
-                <option value="جيد ⭐">جيد ⭐</option>
-                <option value="ضعيف ⚠️">ضعيف ⚠️</option>
-            </select>
-
+            <input type="text" id="sexam_name" placeholder="الامتحان">
             <input type="number" id="spay" placeholder="المبلغ">
             <select id="spaid">
                 <option value="✅">دفع ✅</option>
@@ -104,12 +98,14 @@
     </div>
 
     <script>
+        // دمج البيانات من الكودين
         let myClasses = JSON.parse(localStorage.getItem('myClasses')) || ["عام"];
         let currentClass = localStorage.getItem('lastClass') || myClasses[0];
         let students = JSON.parse(localStorage.getItem('students')) || {};
 
         window.onload = () => updateUI();
 
+        // وظيفة الإصلاح القوية
         function clearEverything() {
             if(confirm("سيتم مسح كل البيانات وتصفير الموقع تماماً لإصلاح أي عطل، هل أنت متأكد؟")) {
                 localStorage.clear();
@@ -131,9 +127,12 @@
             if(confirm(`حذف مجموعة "${className}" بكل طلابها؟`)) {
                 myClasses = myClasses.filter(c => c !== className);
                 if(myClasses.length === 0) myClasses = ["عام"];
+                
+                // حذف الطلاب المرتبطين بهذه المجموعة أيضاً
                 for(let id in students) {
                     if(students[id].levelClass === className) delete students[id];
                 }
+                
                 localStorage.setItem('myClasses', JSON.stringify(myClasses));
                 localStorage.setItem('students', JSON.stringify(students));
                 switchClass(myClasses[0]);
@@ -186,34 +185,31 @@
         function saveData() {
             const id = document.getElementById('sid').value.trim();
             const name = document.getElementById('sname').value.trim();
-            const levelVal = document.getElementById('slevel').value; // جلب المستوى المختار
             
             if(!id || !name) return alert("دخل كود واسم الطالب!");
             
+            // ربط الطالب بالمجموعة الحالية (Current Class)
             if(!students[id]) {
                 students[id] = { name: name, levelClass: currentClass, history: [] };
             } else {
-                students[id].levelClass = currentClass;
+                students[id].levelClass = currentClass; // تحديث المجموعة لو مضاف في مجموعة تانية
             }
             
             students[id].history.push({
                 date: new Date().toLocaleDateString('ar-EG'),
                 grade: document.getElementById('sgrade').value || "0",
                 examName: document.getElementById('sexam_name').value || "حصة",
-                level: levelVal || "غير محدد", // تخزين المستوى في قاعدة البيانات
                 pay: document.getElementById('spay').value || "0",
                 paidStatus: document.getElementById('spaid').value
             });
             
             localStorage.setItem('students', JSON.stringify(students));
             
-            // تصفير الخانات
+            // مسح الخانات
             document.getElementById('sid').value = "";
             document.getElementById('sname').value = "";
             document.getElementById('sgrade').value = "";
-            document.getElementById('sexam_name').value = "";
             document.getElementById('sSearch').value = "";
-            document.getElementById('slevel').selectedIndex = 0;
             
             renderAdmin();
             alert("تم الحفظ بنجاح في مجموعة " + currentClass);
@@ -233,7 +229,6 @@
                             <td>${h.date}</td>
                             <td>${h.examName}</td>
                             <td style="color:var(--accent); font-weight:bold;">${h.grade}</td>
-                            <td style="color:#ffcc00; font-size:0.85rem;">${h.level || '---'}</td>
                             <td>${h.pay} ج.م</td>
                             <td>${h.paidStatus}</td>
                             <td><button class="btn-del" onclick="event.stopPropagation(); deleteSession('${id}', ${i})">❌</button></td>
@@ -253,10 +248,10 @@
                             <table class="history-table">
                                 <thead>
                                     <tr>
-                                        <th>التاريخ</th><th>الامتحان</th><th>الدرجة</th><th>المستوى</th><th>المبلغ</th><th>الحالة</th><th>حذف</th>
+                                        <th>التاريخ</th><th>الامتحان</th><th>الدرجة</th><th>المبلغ</th><th>الحالة</th><th>حذف</th>
                                     </tr>
                                 </thead>
-                                <tbody>${rows || '<tr><td colspan="7">لا يوجد سجلات</td></tr>'}</tbody>
+                                <tbody>${rows || '<tr><td colspan="6">لا يوجد سجلات</td></tr>'}</tbody>
                             </table>
                         </div>
                     </div>`;
