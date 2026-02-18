@@ -18,8 +18,9 @@
         td { padding: 12px; border-bottom: 1px solid #30363d; font-size: 14px; background-color: #0d1117; color: #e6edf3; }
         .pay-ok { color: #4caf50; font-weight: bold; }
         .pay-no { color: #f44336; font-weight: bold; }
-        .logout-btn { background-color: #30363d; color: white; margin-top: 25px; width: auto; padding: 10px 30px; border-radius: 8px; cursor: pointer; }
+        .logout-btn { background-color: #ef4444; color: white; margin-top: 25px; width: auto; padding: 10px 30px; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
         .switch-link { color: #58a6ff; cursor: pointer; display: block; margin-top: 15px; font-size: 0.9rem; }
+        .level-badge { color: #ffcc00; font-size: 0.85rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -50,6 +51,7 @@
                         <th>التاريخ</th>
                         <th>الامتحان/الحصة</th>
                         <th>الدرجة</th>
+                        <th>المستوى</th>
                         <th>المبلغ</th>
                         <th>الحالة</th>
                     </tr>
@@ -57,11 +59,19 @@
                 <tbody id="gradesTable"></tbody>
             </table>
         </div>
-        <button class="logout-btn" onclick="location.reload()">تسجيل خروج</button>
+        <button class="logout-btn" onclick="logout()">تسجيل خروج</button>
     </div>
 </div>
 
 <script>
+    // عند تحميل الصفحة، نتحقق هل الطالب مسجل دخول مسبقاً؟
+    window.onload = function() {
+        const savedStudentId = localStorage.getItem('loggedStudentId');
+        if (savedStudentId) {
+            loadStudentData(savedStudentId);
+        }
+    };
+
     function showRegister() { document.getElementById('loginPage').style.display='none'; document.getElementById('registerPage').style.display='block'; }
     function showLogin() { document.getElementById('loginPage').style.display='block'; document.getElementById('registerPage').style.display='none'; }
 
@@ -69,7 +79,6 @@
         const id = document.getElementById('studentCode').value.trim();
         const pass = document.getElementById('studentPass').value.trim();
 
-        // دخول الأدمن السريع
         if (id === "Dawla" && pass === "123400") {
             window.location.href = "admin.html";
             return;
@@ -79,32 +88,46 @@
         let student = students[id];
         
         if (student && student.password === pass) {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dataPage').style.display = 'block';
-            document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
-            
-            let rows = "";
-            let history = student.history || [];
-            
-            if(history.length === 0) {
-                rows = "<tr><td colspan='5'>لا توجد بيانات مسجلة لك حتى الآن</td></tr>";
-            } else {
-                // عرض السجلات من الأحدث للأقدم
-                [...history].reverse().forEach(h => {
-                    let payStatusClass = h.paidStatus === "✅" ? "pay-ok" : "pay-no";
-                    rows += `<tr>
-                        <td>${h.date}</td>
-                        <td style="color:var(--accent)">${h.examName || "حصة"}</td>
-                        <td style="font-weight:bold;">${h.grade}</td>
-                        <td class="${payStatusClass}">${h.pay} ج.م</td>
-                        <td>${h.paidStatus}</td>
-                    </tr>`;
-                });
-            }
-            document.getElementById('gradesTable').innerHTML = rows;
+            localStorage.setItem('loggedStudentId', id); // حفظ الجلسة
+            loadStudentData(id);
         } else { 
             alert("الكود أو كلمة السر خطأ، أو ربما لم تقم بتفعيل حسابك بعد!"); 
         }
+    }
+
+    function loadStudentData(id) {
+        let students = JSON.parse(localStorage.getItem('students')) || {};
+        let student = students[id];
+
+        if (!student) {
+            logout();
+            return;
+        }
+
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('registerPage').style.display = 'none';
+        document.getElementById('dataPage').style.display = 'block';
+        document.getElementById('welcomeMsg').innerText = "أهلاً بك يا " + student.name;
+        
+        let rows = "";
+        let history = student.history || [];
+        
+        if(history.length === 0) {
+            rows = "<tr><td colspan='6'>لا توجد بيانات مسجلة لك حتى الآن</td></tr>";
+        } else {
+            [...history].reverse().forEach(h => {
+                let payStatusClass = h.paidStatus === "✅" ? "pay-ok" : "pay-no";
+                rows += `<tr>
+                    <td>${h.date}</td>
+                    <td style="color:var(--accent)">${h.examName || "حصة"}</td>
+                    <td style="font-weight:bold;">${h.grade}</td>
+                    <td class="level-badge">${h.level || "---"}</td>
+                    <td class="${payStatusClass}">${h.pay} ج.م</td>
+                    <td>${h.paidStatus}</td>
+                </tr>`;
+            });
+        }
+        document.getElementById('gradesTable').innerHTML = rows;
     }
 
     function register() {
@@ -115,7 +138,6 @@
 
         let students = JSON.parse(localStorage.getItem('students')) || {};
 
-        // لازم المستر يكون ضاف الطالب الأول في صفحة الـ Admin
         if (students[id]) {
             students[id].password = pass;
             localStorage.setItem('students', JSON.stringify(students));
@@ -124,6 +146,11 @@
         } else { 
             alert("عذراً، هذا الكود غير موجود! تأكد أن المستر قد قام بإضافتك أولاً."); 
         }
+    }
+
+    function logout() {
+        localStorage.removeItem('loggedStudentId'); // حذف الجلسة
+        location.reload();
     }
 </script>
 </body>
