@@ -2,61 +2,56 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم مستر الدولا | برمجة عمرو جابر</title>
+    <title>لوحة تحكم مستر الدولا | مؤمنة</title>
     <style>
         :root { --primary: #7c3aed; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #00d2ff; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; min-height: 100vh; position: relative; padding-bottom: 80px; }
         .container { max-width: 1100px; margin: auto; }
         
-        .fix-btn { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; transition: 0.3s; }
-        .fix-btn:hover { background: #b91c1c; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        /* أزرار الأمان والنسخ */
+        .admin-tools { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tool-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+        .backup-btn { background: #059669; }
+        .restore-btn { background: #2563eb; }
+        .fix-btn { background: #ef4444; }
 
         .header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
-        
         .class-manager { background: #161b22; padding: 20px; border-radius: 15px; border: 1px dashed var(--accent); margin-bottom: 30px; display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
         .class-manager input { width: 250px; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
-        
         .btn-create { background: var(--accent); color: #000; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
         .tab-btn { padding: 12px 25px; background: var(--card); border: 1px solid #334155; color: white; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
         .tab-btn.active { background: var(--primary); border-color: var(--accent); box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
-
         .input-card { background: var(--card); padding: 25px; border-radius: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; border: 2px solid var(--primary); position: relative; }
         .input-card h3 { grid-column: 1/-1; margin: 0; color: var(--accent); text-align: center; margin-bottom: 10px; }
-        
         input, select { padding: 12px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
-        
-        .search-results { position: absolute; top: 120px; right: 25px; width: 220px; background: #1e293b; border: 1px solid var(--accent); z-index: 100; border-radius: 10px; display: none; max-height: 150px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .search-results { position: absolute; top: 120px; right: 25px; width: 220px; background: #1e293b; border: 1px solid var(--accent); z-index: 100; border-radius: 10px; display: none; max-height: 150px; overflow-y: auto; }
         .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #334155; }
         .search-item:hover { background: var(--primary); }
-
-        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; grid-column: 1 / -1; font-size: 1.1rem; transition: 0.3s; }
-        .btn-add:hover { opacity: 0.9; transform: translateY(-2px); }
-
-        .student-folder { background: var(--card); border-radius: 20px; margin-bottom: 15px; border-right: 6px solid var(--primary); overflow: hidden; transition: 0.3s; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; grid-column: 1 / -1; font-size: 1.1rem; }
+        .student-folder { background: var(--card); border-radius: 20px; margin-bottom: 15px; border-right: 6px solid var(--primary); overflow: hidden; }
         .folder-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #242f42; }
         .folder-content { display: none; padding: 20px; background: #161b22; }
-        
         .history-table { width: 100%; border-collapse: collapse; }
         .history-table th, .history-table td { padding: 12px; text-align: center; border-bottom: 1px solid #334155; }
-        .history-table th { color: var(--accent); }
-        
-        .btn-del { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
-        
+        .btn-del { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
         .dev-footer { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-size: 0.8rem; color: rgba(255, 255, 255, 0.15); text-transform: uppercase; letter-spacing: 3px; }
-        .dev-name { font-weight: bold; border-left: 2px solid var(--primary); padding-left: 10px; margin-left: 10px; }
-        .del-class-btn { color: #ff4d4d; font-weight: bold; margin-left: 5px; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <button class="fix-btn" onclick="clearEverything()">⚠️ تصفير الذاكرة وإصلاح العطل (اضغط هنا لو الجدول مش ظاهر)</button>
+        <div class="admin-tools">
+            <button class="tool-btn fix-btn" onclick="clearEverything()">⚠️ تصفير شامل</button>
+            <button class="tool-btn backup-btn" onclick="exportData()">📥 تحميل نسخة احتياطية</button>
+            <button class="tool-btn restore-btn" onclick="document.getElementById('importFile').click()">📤 رفع نسخة احتياطية</button>
+            <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+            <button class="tool-btn" style="background:#4b5563" onclick="logout()">🔒 تسجيل خروج</button>
+        </div>
 
         <div class="header">
             <h1>لوحة تحكم مستر الدولا 🎓</h1>
-            <p>نظام الإدارة الذكي للطلاب | إدارة الحصص والمبالغ</p>
+            <p>نظام الإدارة المؤمن | تحديد المستوى والنسخ الاحتياطي</p>
         </div>
 
         <div class="class-manager">
@@ -68,17 +63,14 @@
 
         <div class="input-card">
             <h3>إضافة بيانات طالب في: <span id="activeClassNameText" style="color:var(--accent)"></span></h3>
-            
             <div style="position:relative;">
                 <input type="text" id="sSearch" placeholder="🔍 ابحث هنا للاختيار السريع" oninput="searchStudents(this.value)" style="width: 100%; box-sizing: border-box;">
                 <div id="searchRes" class="search-results"></div>
             </div>
-            
             <input type="text" id="sid" placeholder="الكود">
             <input type="text" id="sname" placeholder="اسم الطالب">
             <input type="text" id="sexam_name" placeholder="الامتحان">
             <input type="number" id="sgrade" placeholder="الدرجة">
-            
             <select id="slevel">
                 <option value="" disabled selected>تحديد المستوى</option>
                 <option value="ممتاز ⭐⭐⭐">ممتاز ⭐⭐⭐</option>
@@ -86,7 +78,6 @@
                 <option value="جيد ⭐">جيد ⭐</option>
                 <option value="ضعيف ⚠️">ضعيف ⚠️</option>
             </select>
-
             <input type="number" id="spay" placeholder="المبلغ">
             <select id="spaid">
                 <option value="✅">دفع ✅</option>
@@ -96,48 +87,62 @@
         </div>
 
         <div id="studentsList"></div>
-
-        <div class="dev-footer">
-            <span>Student Management System</span>
-            <span class="dev-name">Developed by: Amr Gaber</span>
-        </div>
     </div>
 
     <script>
+        // نظام حماية الدخول المباشر
+        if (!sessionStorage.getItem('adminToken')) {
+            alert("غير مسموح بالدخول المباشر!");
+            window.location.href = "index.html";
+        }
+
         let myClasses = JSON.parse(localStorage.getItem('myClasses')) || ["عام"];
         let currentClass = localStorage.getItem('lastClass') || myClasses[0];
         let students = JSON.parse(localStorage.getItem('students')) || {};
 
         window.onload = () => updateUI();
 
-        function clearEverything() {
-            if(confirm("سيتم مسح كل البيانات وتصفير الموقع تماماً لإصلاح أي عطل، هل أنت متأكد؟")) {
-                localStorage.clear();
-                location.reload();
-            }
+        // وظائف النسخ الاحتياطي
+        function exportData() {
+            const data = { myClasses, students };
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Backup_Dawla_${new Date().toLocaleDateString()}.json`;
+            a.click();
         }
 
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.students && imported.myClasses) {
+                        localStorage.setItem('students', JSON.stringify(imported.students));
+                        localStorage.setItem('myClasses', JSON.stringify(imported.myClasses));
+                        alert("تم استعادة البيانات بنجاح!");
+                        location.reload();
+                    }
+                } catch (err) { alert("ملف غير صالح!"); }
+            };
+            reader.readAsText(file);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminToken');
+            window.location.href = "index.html";
+        }
+
+        // باقي وظائف الإدارة الأصلية مع تعديل المستوى
         function createClass() {
             const name = document.getElementById('newClassName').value.trim();
-            if(!name) return;
-            if(myClasses.includes(name)) return alert("المجموعة موجودة بالفعل!");
+            if(!name || myClasses.includes(name)) return;
             myClasses.push(name);
             localStorage.setItem('myClasses', JSON.stringify(myClasses));
-            document.getElementById('newClassName').value = "";
             switchClass(name);
-        }
-
-        function deleteClass(className) {
-            if(confirm(`حذف مجموعة "${className}" بكل طلابها؟`)) {
-                myClasses = myClasses.filter(c => c !== className);
-                if(myClasses.length === 0) myClasses = ["عام"];
-                for(let id in students) {
-                    if(students[id].levelClass === className) delete students[id];
-                }
-                localStorage.setItem('myClasses', JSON.stringify(myClasses));
-                localStorage.setItem('students', JSON.stringify(students));
-                switchClass(myClasses[0]);
-            }
         }
 
         function switchClass(className) {
@@ -147,149 +152,73 @@
         }
 
         function updateUI() {
-            const tabsContainer = document.getElementById('tabsContainer');
-            tabsContainer.innerHTML = myClasses.map(c => `
+            document.getElementById('tabsContainer').innerHTML = myClasses.map(c => `
                 <div class="tab-btn ${currentClass === c ? 'active' : ''}" onclick="switchClass('${c}')">
-                    ${c} <span class="del-class-btn" onclick="event.stopPropagation(); deleteClass('${c}')">×</span>
+                    ${c} <span onclick="event.stopPropagation(); deleteClass('${c}')">×</span>
                 </div>
             `).join('');
-            
-            const label = document.getElementById('activeClassNameText');
-            if(label) label.innerText = currentClass;
-            
+            document.getElementById('activeClassNameText').innerText = currentClass;
             renderAdmin();
-        }
-
-        function searchStudents(query) {
-            const resBox = document.getElementById('searchRes');
-            resBox.innerHTML = '';
-            if(!query) { resBox.style.display = 'none'; return; }
-            let found = false;
-            for(let id in students) {
-                if(students[id].name.includes(query) && students[id].levelClass === currentClass) {
-                    let div = document.createElement('div');
-                    div.className = 'search-item';
-                    div.innerText = students[id].name;
-                    div.onclick = () => {
-                        document.getElementById('sid').value = id;
-                        document.getElementById('sname').value = students[id].name;
-                        document.getElementById('sSearch').value = students[id].name;
-                        resBox.style.display = 'none';
-                    };
-                    resBox.appendChild(div);
-                    found = true;
-                }
-            }
-            resBox.style.display = found ? 'block' : 'none';
         }
 
         function saveData() {
             const id = document.getElementById('sid').value.trim();
             const name = document.getElementById('sname').value.trim();
-            const levelVal = document.getElementById('slevel').value; // جلب المستوى المختار
+            if(!id || !name) return alert("بيانات ناقصة!");
             
-            if(!id || !name) return alert("دخل كود واسم الطالب!");
-            
-            if(!students[id]) {
-                students[id] = { name: name, levelClass: currentClass, history: [] };
-            } else {
-                students[id].levelClass = currentClass;
-            }
+            if(!students[id]) students[id] = { name, levelClass: currentClass, history: [] };
             
             students[id].history.push({
                 date: new Date().toLocaleDateString('ar-EG'),
                 grade: document.getElementById('sgrade').value || "0",
                 examName: document.getElementById('sexam_name').value || "حصة",
-                level: levelVal || "غير محدد", // تخزين المستوى في قاعدة البيانات
+                level: document.getElementById('slevel').value || "غير محدد",
                 pay: document.getElementById('spay').value || "0",
                 paidStatus: document.getElementById('spaid').value
             });
             
             localStorage.setItem('students', JSON.stringify(students));
-            
-            // تصفير الخانات
-            document.getElementById('sid').value = "";
-            document.getElementById('sname').value = "";
-            document.getElementById('sgrade').value = "";
-            document.getElementById('sexam_name').value = "";
-            document.getElementById('sSearch').value = "";
-            document.getElementById('slevel').selectedIndex = 0;
-            
-            renderAdmin();
-            alert("تم الحفظ بنجاح في مجموعة " + currentClass);
+            location.reload(); 
         }
 
         function renderAdmin() {
             const container = document.getElementById('studentsList');
             container.innerHTML = '';
-            let hasStudents = false;
-
             for (let id in students) {
                 if (students[id].levelClass === currentClass) {
-                    hasStudents = true;
-                    
                     let rows = students[id].history.map((h, i) => `
                         <tr>
-                            <td>${h.date}</td>
-                            <td>${h.examName}</td>
-                            <td style="color:var(--accent); font-weight:bold;">${h.grade}</td>
-                            <td style="color:#ffcc00; font-size:0.85rem;">${h.level || '---'}</td>
-                            <td>${h.pay} ج.م</td>
-                            <td>${h.paidStatus}</td>
-                            <td><button class="btn-del" onclick="event.stopPropagation(); deleteSession('${id}', ${i})">❌</button></td>
-                        </tr>
-                    `).reverse().join('');
+                            <td>${h.date}</td><td>${h.examName}</td>
+                            <td style="color:var(--accent)">${h.grade}</td>
+                            <td style="color:#ffcc00">${h.level}</td>
+                            <td>${h.pay}</td><td>${h.paidStatus}</td>
+                            <td><button class="btn-del" onclick="deleteSession('${id}', ${i})">❌</button></td>
+                        </tr>`).reverse().join('');
 
                     container.innerHTML += `
                     <div class="student-folder">
                         <div class="folder-header" onclick="toggleFolder('folder-${id}')">
-                            <h3 style="margin:0;">📁 ${students[id].name} <span style="font-size: 0.8rem; color: #888; margin-right:10px;">(ID: ${id})</span></h3>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <span style="background: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">${students[id].history.length} حصة</span>
-                                <button class="btn-del" onclick="event.stopPropagation(); deleteStudent('${id}')">حذف الطالب</button>
-                            </div>
+                            <h3>📁 ${students[id].name} (${id})</h3>
+                            <button class="btn-del" onclick="deleteStudent('${id}')">حذف الطالب</button>
                         </div>
                         <div id="folder-${id}" class="folder-content">
                             <table class="history-table">
-                                <thead>
-                                    <tr>
-                                        <th>التاريخ</th><th>الامتحان</th><th>الدرجة</th><th>المستوى</th><th>المبلغ</th><th>الحالة</th><th>حذف</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${rows || '<tr><td colspan="7">لا يوجد سجلات</td></tr>'}</tbody>
+                                <thead><tr><th>التاريخ</th><th>الامتحان</th><th>الدرجة</th><th>المستوى</th><th>المبلغ</th><th>الحالة</th><th>حذف</th></tr></thead>
+                                <tbody>${rows}</tbody>
                             </table>
                         </div>
                     </div>`;
                 }
             }
-            
-            if (!hasStudents) {
-                container.innerHTML = `<div style="text-align:center; padding:50px; opacity:0.5; border: 1px dashed #334155; border-radius:15px;">لا يوجد طلاب في مجموعة (${currentClass}) حتى الآن.</div>`;
-            }
         }
 
         function toggleFolder(id) {
             const el = document.getElementById(id);
-            if(el) {
-                const isVisible = el.style.display === 'block';
-                el.style.display = isVisible ? 'none' : 'block';
-            }
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
         }
 
-        function deleteSession(id, index) {
-            if(!confirm("حذف هذا السجل فقط؟")) return;
-            students[id].history.splice(index, 1);
-            localStorage.setItem('students', JSON.stringify(students));
-            renderAdmin();
-        }
-
-        function deleteStudent(id) {
-            if(confirm("حذف الطالب وكل سجلاته نهائياً؟")) {
-                delete students[id];
-                localStorage.setItem('students', JSON.stringify(students));
-                renderAdmin();
-            }
-        }
+        function clearEverything() { if(confirm("حذف كلي؟")) { localStorage.clear(); location.reload(); } }
+        function deleteStudent(id) { if(confirm("حذف الطالب؟")) { delete students[id]; localStorage.setItem('students', JSON.stringify(students)); renderAdmin(); } }
     </script>
 </body>
 </html>
